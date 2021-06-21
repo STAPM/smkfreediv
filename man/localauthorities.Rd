@@ -8,7 +8,7 @@
 
 }
 \source{
-\href{https://data.gov.uk/dataset/6ee49b1e-0f4d-4079-90f4-b626e36d2035/lower-tier-local-authority-to-upper-tier-local-authority-april-2019-lookup-in-england-and-wales}
+\href{https://data.gov.uk/dataset/6ee49b1e-0f4d-4079-90f4-b626e36d2035/lower-tier-local-authority-to-upper-tier-local-authority-april-2019-lookup-in-england-and-wales}{Local Authority lookup}
 }
 \usage{
 localauthorities

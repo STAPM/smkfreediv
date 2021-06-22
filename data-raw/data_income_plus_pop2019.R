@@ -2,7 +2,7 @@ library(readxl)
 library(data.table)
 library(stringr)
 
-reps <- 50
+reps <- 20000
 set.seed(2021)
 
 #################################################################################

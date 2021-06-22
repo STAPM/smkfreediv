@@ -27,9 +27,7 @@ CalcDividend_la(
 
 }
 \description{
-Calculate the smoke-free dividend for each local authority, using simulation
-methods to incorporate parameter uncertainty in weekly expenditure, local smoking
-prevalence, local authority average incomes.
+Calculate the smoke-free dividend for each local authority.
 }
 \examples{
 

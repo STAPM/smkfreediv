@@ -14,6 +14,10 @@
 #' @export
 #'
 #' @examples
+#'
+#' \dontrun{
+#'
+#' }
 CalcDividend_la_sim <- function(data,
                                 upshift = 1.57151042,
                                 div = 0.93,
@@ -35,6 +39,7 @@ CalcDividend_la_sim <- function(data,
   m_n_smokers           <- matrix(rep(NA,n_sim*151), ncol = n_sim)
   m_smk_prev            <- matrix(rep(NA,n_sim*151), ncol = n_sim)
   m_mean_week_spend     <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_mean_week_spend_up  <- matrix(rep(NA,n_sim*151), ncol = n_sim)
   m_income              <- matrix(rep(NA,n_sim*151), ncol = n_sim)
   m_total_wk_exp        <- matrix(rep(NA,n_sim*151), ncol = n_sim)
   m_total_annual_exp    <- matrix(rep(NA,n_sim*151), ncol = n_sim)
@@ -72,6 +77,7 @@ CalcDividend_la_sim <- function(data,
     m_n_smokers[,i]           <- as.vector(as.matrix(div_la[,"prob_n_smokers"]))
     m_smk_prev[,i]            <- as.vector(as.matrix(div_la[,"prob_smk_prev"]))
     m_mean_week_spend[,i]     <- as.vector(as.matrix(div_la[,"prob_mean_week_spend"]))
+    m_mean_week_spend_up[,i]  <- as.vector(as.matrix(div_la[,"prob_mean_week_spend_up"]))
     m_total_wk_exp[,i]        <- as.vector(as.matrix(div_la[,"prob_total_wk_exp"]))
     m_total_annual_exp[,i]    <- as.vector(as.matrix(div_la[,"prob_total_annual_exp"]))
     m_spend_prop[,i]          <- as.vector(as.matrix(div_la[,"prob_spend_prop"]))
@@ -123,7 +129,7 @@ CalcDividend_la_sim <- function(data,
   cat("\t\tdone\n")
   ### -----------------------------------------------------------------###
   ### --------------- Mean Weekly Spending ----------------------------###
-  cat(crayon::cyan("\t\tSmoking Prevalence"))
+  cat(crayon::cyan("\t\tMean Weekly Expenditure"))
 
   m <- data.table(m_mean_week_spend)
 
@@ -132,6 +138,19 @@ CalcDividend_la_sim <- function(data,
   m_mean_week_spend   <- cbind(m_m[,"M"] ,m_s[,"SD"])
 
   setnames(m_mean_week_spend, c("M","SD"), c("mean_week_spend_m","mean_week_spend_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Mean Weekly Spending upshifted ------------------###
+  cat(crayon::cyan("\t\tMean Weekly Expenditure (upshifted)"))
+
+  m <- data.table(m_mean_week_spend_up)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_mean_week_spend_up   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_mean_week_spend_up, c("M","SD"), c("mean_week_spend_up_m","mean_week_spend_up_sd"))
 
   cat("\t\tdone\n")
   ### -----------------------------------------------------------------###

@@ -9,9 +9,7 @@ CalcDividend_la(
   clean_income,
   clean_expenditure,
   upshift = 1.57151042,
-  div = 0.93,
-  reps = 10000,
-  seed = 2021
+  div = 0.93
 )
 }
 \arguments{
@@ -24,10 +22,6 @@ CalcDividend_la(
 \item{upshift}{Numeric. Parameter to upshift expenditures calculated from the toolkit data.}
 
 \item{div}{Numeric. Proportion of expenditure paid in tax.}
-
-\item{reps}{Integer. Number of simulation replications.}
-
-\item{seed}{Integer. Random number seed.}
 }
 \value{
 

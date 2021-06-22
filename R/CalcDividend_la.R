@@ -1,8 +1,6 @@
 #' Calculate Local Authority Level Dividend
 #'
-#' Calculate the smoke-free dividend for each local authority, using simulation
-#' methods to incorporate parameter uncertainty in weekly expenditure, local smoking
-#' prevalence, local authority average incomes.
+#' Calculate the smoke-free dividend for each local authority.
 #'
 #' @param profiles PHE local tobacco profiles.
 #' @param clean_income Data table. Cleaned income data.

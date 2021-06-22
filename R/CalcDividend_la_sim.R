@@ -1,0 +1,248 @@
+#' Simulate Local Authority Dividend Calculation
+#'
+#' Calculate the smoke-free dividend for each local authority, using simulation
+#' methods to incorporate parameter uncertainty in weekly expenditure, local smoking
+#' prevalence, local authority average incomes.
+#'
+#' @param data Data table. Cleaned toolkit data
+#' @param upshift Numeric. Parameter to upshift expenditures calculated from the toolkit data.
+#' @param div Numeric. Proportion of expenditure paid in tax.
+#' @param n_sim Numeric. Number of simulations.
+#' @param seed Numeric. Random number seed.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+CalcDividend_la_sim <- function(data,
+                                upshift = 1.57151042,
+                                div = 0.93,
+                                n_sim = 100,
+                                seed = 2021) {
+
+  set.seed(seed)
+
+  ## Calculate mean weekly expenditure by upper-tier local authority
+  cat(crayon::green("Calculating Local Authority Smokefree Dividends\n"))
+
+  mean_spend_la <- smkfreediv::CalcWeekSpend(data = data,
+                                             strat_vars = c("UTLAcode","UTLAname"))
+
+  mean_spend_la <- mean_spend_la[order(UTLAname)]
+
+  ## Initialise matrices for probabilistic variables
+
+  m_n_smokers           <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_smk_prev            <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_mean_week_spend     <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_income              <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_total_wk_exp        <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_total_annual_exp    <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_spend_prop          <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_total_wk_exp_up     <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_total_annual_exp_up <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_spend_prop_up       <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+  m_dividend            <- matrix(rep(NA,n_sim*151), ncol = n_sim)
+
+  cat(crayon::blue("\tGenerating Probabilistic Variables\n"))
+
+  for (i in 1:n_sim) {
+
+    cat("\t\tSimulating...", round(100*i/n_sim,2),"%", "               \r")
+    utils::flush.console()
+    if(i == n_sim) { cat("\n") }
+    ## Grab the income data
+
+    income <- smkfreediv::GetIncome(mapping_data = smkfreediv::localauthorities,
+                                    income_data = smkfreediv::la_inc_pop,
+                                    income_var = 3)
+
+    ## Use the income/spending to calculate the smoke free dividend for
+    ## each local authority.
+
+    div_la <- CalcDividend_la(profiles = smkfreediv::tobacco_profiles,
+                              clean_income = income,
+                              clean_expenditure = mean_spend_la,
+                              upshift = 1.57151042,
+                              div = 0.93)
+
+    ## save out probabilistic results
+
+    m_income[,i]              <- as.vector(as.matrix(div_la[,"prob_income"]))
+    m_n_smokers[,i]           <- as.vector(as.matrix(div_la[,"prob_n_smokers"]))
+    m_smk_prev[,i]            <- as.vector(as.matrix(div_la[,"prob_smk_prev"]))
+    m_mean_week_spend[,i]     <- as.vector(as.matrix(div_la[,"prob_mean_week_spend"]))
+    m_total_wk_exp[,i]        <- as.vector(as.matrix(div_la[,"prob_total_wk_exp"]))
+    m_total_annual_exp[,i]    <- as.vector(as.matrix(div_la[,"prob_total_annual_exp"]))
+    m_spend_prop[,i]          <- as.vector(as.matrix(div_la[,"prob_spend_prop"]))
+    m_total_wk_exp_up[,i]     <- as.vector(as.matrix(div_la[,"prob_total_wk_exp_up"]))
+    m_total_annual_exp_up[,i] <- as.vector(as.matrix(div_la[,"prob_total_annual_exp_up"]))
+    m_spend_prop_up[,i]       <- as.vector(as.matrix(div_la[,"prob_spend_prop_up"]))
+    m_dividend[,i]            <- as.vector(as.matrix(div_la[,"prob_dividend"]))
+  }
+
+  cat(crayon::blue("\tGenerating Simulation Means and Standard Deviations\n"))
+
+  ### -------------------- Income -------------------------------------###
+  cat(crayon::cyan("\t\tAverage Annual Income"))
+
+  m <- data.table(m_income)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_income   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_income, c("M","SD"), c("income_m","income_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### ------------------Number of Smokers -----------------------------###
+  cat(crayon::cyan("\t\tNumber of Smokers"))
+
+  m <- data.table(m_n_smokers)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_n_smokers   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_n_smokers, c("M","SD"), c("n_smokers_m","n_smokers_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### ------------------ Smoking Prevalence ---------------------------###
+  cat(crayon::cyan("\t\tSmoking Prevalence"))
+
+  m <- data.table(m_smk_prev)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_smk_prev   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_smk_prev, c("M","SD"), c("smk_prev_m","smk_prev_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Mean Weekly Spending ----------------------------###
+  cat(crayon::cyan("\t\tSmoking Prevalence"))
+
+  m <- data.table(m_mean_week_spend)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_mean_week_spend   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_mean_week_spend, c("M","SD"), c("mean_week_spend_m","mean_week_spend_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Total weekly spending ---------------------------###
+  cat(crayon::cyan("\t\tTotal Weekly Expenditure"))
+
+  m <- data.table(m_total_wk_exp)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_total_wk_exp   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_total_wk_exp, c("M","SD"), c("total_wk_exp_m","total_wk_exp_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Total annual spending ---------------------------###
+  cat(crayon::cyan("\t\tTotal Annual Expenditure"))
+
+  m <- data.table(m_total_annual_exp)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_total_annual_exp   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_total_annual_exp, c("M","SD"), c("total_annual_exp_m","total_annual_exp_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Total weekly spending upshifted------------------###
+  cat(crayon::cyan("\t\tTotal Weekly Expenditure (upshifted)"))
+
+  m <- data.table(m_total_wk_exp_up)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_total_wk_exp_up   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_total_wk_exp_up, c("M","SD"), c("total_wk_exp_up_m","total_wk_exp_up_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Total annual spending upshifted------------------###
+  cat(crayon::cyan("\t\tTotal Annual Expenditure (upshifted)"))
+
+  m <- data.table(m_total_annual_exp_up)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_total_annual_exp_up   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_total_annual_exp_up, c("M","SD"), c("total_annual_exp_up_m","total_annual_exp_up_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Spending as % of Income -------------------------###
+  cat(crayon::cyan("\t\tSpending proportion of Income"))
+
+  m <- data.table(m_spend_prop)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_spend_prop   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_spend_prop, c("M","SD"), c("spend_prop_m","spend_prop_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Spending as % of Income upshifted----------------###
+  cat(crayon::cyan("\t\tSpending proportion of Income (upshifted)"))
+
+  m <- data.table(m_spend_prop_up)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_spend_prop_up   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_spend_prop_up, c("M","SD"), c("spend_prop_up_m","spend_prop_up_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  ### --------------- Smoke-free dividend -----------------------------###
+  cat(crayon::cyan("\t\tSmokefree Dividend"))
+
+  m <- data.table(m_dividend)
+
+  m_m <- transform(m, M=apply(m,1, mean, na.rm = TRUE))
+  m_s <- transform(m, SD=apply(m,1, sd, na.rm = TRUE))
+  m_dividend   <- cbind(m_m[,"M"] ,m_s[,"SD"])
+
+  setnames(m_dividend, c("M","SD"), c("dividend_m","dividend_sd"))
+
+  cat("\t\tdone\n")
+  ### -----------------------------------------------------------------###
+  rm(m_m, m_s, m)
+  gc()
+
+  ### Combine data
+
+  data_out <- div_la[, c("prob_n_smokers","prob_smk_prev","prob_mean_week_spend","prob_income",
+                         "prob_total_wk_exp","prob_total_annual_exp",
+                         "prob_spend_prop","prob_mean_week_spend_up","prob_total_wk_exp_up",
+                         "prob_total_annual_exp_up","prob_spend_prop_up","prob_dividend") := NULL]
+
+  data_out <- cbind(data_out, m_income, m_n_smokers, m_smk_prev, m_mean_week_spend,
+                    m_spend_prop, m_spend_prop_up, m_total_wk_exp, m_total_wk_exp_up,
+                    m_total_annual_exp, m_total_annual_exp_up)
+
+  cat(crayon::green("done\n"))
+
+  data_out <- data_out[order(UTLAname),]
+
+  return(data_out)
+}

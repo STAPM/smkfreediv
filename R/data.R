@@ -1,3 +1,10 @@
+#' Local Authority to Region Lookup
+#'
+#' A lookup table to match local authority districts to government office region geographies.
+#'
+#' @format
+"la_gor_lookup"
+
 #' Local Authority Data.
 #'
 #' A dataset containing lower tier local authorities income and population counts. Raw data gives

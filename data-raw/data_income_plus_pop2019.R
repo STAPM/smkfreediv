@@ -2,7 +2,8 @@ library(readxl)
 library(data.table)
 library(stringr)
 
-reps <- 10000
+reps <- 50
+set.seed(2021)
 
 #################################################################################
 ######### Get LTLA level income data and population data to use to weight up
@@ -86,7 +87,7 @@ m_income     = matrix(rep(NA, 326*reps), ncol = reps)
 
 for (i in 1:reps) {
 
-  cat("\t\t1. Simulating Net Income", round(100*i/reps),"%", "               \r")
+  cat("\t\t1. Simulating Net Income", round(100*i/reps,2),"%", "               \r")
   utils::flush.console()
   if(i == reps) { cat("\n") }
 
@@ -152,7 +153,7 @@ m_income     = matrix(rep(NA, 326*reps), ncol = reps)
 
 for (i in 1:reps) {
 
-cat("\t\t2. Simulating Net Income", round(100*i/reps),"%", "               \r")
+cat("\t\t2. Simulating Net Income", round(100*i/reps,2),"%", "               \r")
 utils::flush.console()
 if(i == reps) { cat("\n") }
 
@@ -178,7 +179,7 @@ m_income   <- cbind(m_income_m[,"M"] ,m_income_s[,"SD"])
 net_annual_inc_eq <- cbind(income_la, m_income)
 setnames(net_annual_inc_eq,
          c("income","M","SD"),
-         c("net_annual_inc_eq","net_annual_inc_eq_M","nnet_annual_inc_eq_SD"))
+         c("net_annual_inc_eq","net_annual_inc_eq_M","net_annual_inc_eq_SD"))
 
 rm(income, m_income, m_income_m, m_income_s, income_la, data_prob)
 
@@ -219,7 +220,7 @@ m_income     = matrix(rep(NA, 326*reps), ncol = reps)
 
 for (i in 1:reps) {
 
-  cat("\t\t3. Simulating Net Income", round(100*i/reps),"%", "               \r")
+  cat("\t\t3. Simulating Net Income", round(100*i/reps,2),"%", "               \r")
   utils::flush.console()
   if(i == reps) { cat("\n") }
 
@@ -262,5 +263,7 @@ la_inc_pop <- copy(merge3)
 rm(merge1, merge2, merge3, pop, net_annual_inc, net_annual_inc_eq, net_annual_inc_eq_disp)
 
 #### save out final data
+
+la_inc_pop <- la_inc_pop[order(LAname),]
 
 usethis::use_data(la_inc_pop, overwrite = TRUE)

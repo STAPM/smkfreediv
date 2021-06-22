@@ -245,7 +245,7 @@ m_income   <- cbind(m_income_m[,"M"] ,m_income_s[,"SD"])
 net_annual_inc_eq_disp <- cbind(income_la, m_income)
 setnames(net_annual_inc_eq_disp,
          c("income","M","SD"),
-         c("net_annual_inc_eq_disp","net_annual_inc_eq_disp_M","nnet_annual_inc_eq_disp_SD"))
+         c("net_annual_inc_eq_disp","net_annual_inc_eq_disp_M","net_annual_inc_eq_disp_SD"))
 
 rm(income, m_income, m_income_m, m_income_s, income_la, data_prob)
 

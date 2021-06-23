@@ -1,0 +1,149 @@
+---
+title: "Calculating the Smoke-free Dividend"
+author: "Damon Morris"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{package-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(smkfreediv)
+library(data.table)
+library(ggplot2)
+```
+
+## Introduction
+
+The purpose of this vignette is to explain how to use the package `smkfreediv` package to produce estimates of 
+the smoke free dividend for local authorities in England.
+
+### Smoke free Dividend 
+
+Chapter 7 of the Royal College of Physicians report ['Smoking and health 2021: A coming of age for tobacco control?'](https://www.rcplondon.ac.uk/projects/outputs/smoking-and-health-2021-coming-age-tobacco-control) links to evidence that 93% of spending on tobacco does not remain in the local community - it goes to manufacturers as profits or to the Treasury as tax revenue. There is therefore a potential 'dividend' to be redistributed back to local areas of 93% of the spend on tobacco if individuals switched their expenditure on tobacco to other goods.  This figure is based on [Counter arguments: how important is 
+tobacco to small retailers?](http://ash.org.uk/information-and-resources/reports-submissions/reports/counter-arguments-how-important-is-tobacco-to-small-retailer) by Action on Smoking and Health (ASH)
+
+
+In particular, as the areas with greater deprivation/lower incomes are also the areas with higher smoking prevalence. There is therefore an inequality dimension. Reducing smoking can therefore be interpreted as a highly targeted tax cut, benefiting the most disadvantaged communities.
+
+## Data Sources
+
+### Smoking Toolkit Study (STS)
+
+Data on tobacco expenditures are obtained from the smoking toolkit study. The data contains individuals' self-reported weekly expenditure on all tobacco products. From the April 2014 wave onwards we have information on the local authority district (upper-tier) where the individual lives. In order to make local authority-level calculations we therefore use all toolkit study waves from April 2014 to February 2020, five years of data excluding the March 2020 wave which did not take place due to the coronavirus pandemic. 
+
+This data is used to calculate for each local authority the mean weekly expenditure on tobacco by smokers, and the standard error of the mean produced to facilitate incorporating uncertainty in the mean estimates thgrough the rest of the calculation.   
+
+### Tobacco Profiles
+
+Data on the smoking population at local authority level is obtained from the [Public Health England (PHE) local tobacco profiles](https://fingertips.phe.org.uk/profile/tobacco-control/data#page/0) for 2019. These data are stored in the package data`smkfreediv::tobacco_profiles` and includes variables for smoking prevalence and number of smokers, their associated 
+standard errors, and population size by local authority district (151 districts). 
+
+```{r tob_profiles, echo = FALSE}
+head(smkfreediv::tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Doncaster","Rotherham"),
+                                  c("UTLAname","pop_n","smk_prev","smk_prev_se","n_smokers","n_smokers_se")])
+```
+
+Data on the number of smokers by local authority is required to calculate total expenditure on tobacco by local authority, by combining this information with the mean expenditure produced using the toolkit data. The tobacco profiles include information on the local authority smoking population, smoking prevalence, and confidence intervals for smoking prevalence. 
+
+A standard error for the number of smokers is not included in the tobacco profiles, so is obtained by calculating the total local authority population from the smoking prevalence and number of smokers figures. The smoking prevalence figure is then simulated using its point estimate and standard error and applied to the population figure to give a distribution of number of smokers from which a standard deviation can be calculated to proxy the standard error. 50,000 simulation replications are used to produce the standard deviation included with the tobacco profiles data in `smkfreediv::tobacco_profiles`. 
+
+The plot below gives an example of the uncertainty around the smoking prevalence figures. For each of the four local authority districts in South Yorkshire, 1,000 values for smoking prevalence are drawn at random from normal distributions characterised by setting the mean equal to the point estimate for the local authority in the tobacco profiles, and the standard deviation equal to the standard error. 
+
+The plot shows that the mean estimated smoking prevalences for Barnsley, Doncaster, and Rotherham are similar and in the range of 17.5% to 19% while for Sheffield the figure is much lower at 14%. The plot shows there is some probability of the true prevalences being closer, with the upper tail of the Sheffield distribution overlapping with the lower tails of the other distributions.
+
+```{r s_yorks, echo = FALSE, fig.asp = 0.8, fig.width = 6}
+data <- smkfreediv::tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Doncaster","Rotherham"),
+                             c("UTLAname","pop_n","smk_prev","smk_prev_se","n_smokers","n_smokers_se")]
+
+### generate normal distributions
+
+n_sim <- 1000
+set.seed(2021)
+
+Barnsley <- rnorm(n_sim, 
+                  mean = as.numeric(data[UTLAname == "Barnsley",c("smk_prev")]) ,
+                  sd =   as.numeric(data[UTLAname == "Barnsley",c("smk_prev_se")]) )
+
+Doncaster <- rnorm(n_sim, 
+                  mean = as.numeric(data[UTLAname == "Doncaster",c("smk_prev")]) ,
+                  sd =   as.numeric(data[UTLAname == "Doncaster",c("smk_prev_se")]) )
+
+Rotherham <- rnorm(n_sim, 
+                   mean = as.numeric(data[UTLAname == "Rotherham",c("smk_prev")]) ,
+                   sd =   as.numeric(data[UTLAname == "Rotherham",c("smk_prev_se")]) )
+
+Sheffield <- rnorm(n_sim, 
+                   mean = as.numeric(data[UTLAname == "Sheffield",c("smk_prev")]) ,
+                   sd =   as.numeric(data[UTLAname == "Sheffield",c("smk_prev_se")]) )
+
+id <- 1:n_sim
+
+### combine into data table 
+
+data <- cbind(id, Barnsley, Doncaster, Rotherham, Sheffield)
+data <- as.data.table(data)
+
+reshape <- melt(data, id.vars = "id", variable.name = "la", value.name = "prev")
+
+ggplot(reshape) +
+  aes(x = prev, fill = la, color = la) +
+  geom_density(alpha = 0.2) +
+  theme_minimal() +
+  labs(y = "Density",
+       x = "Smoking Prevalence (%)",
+       title = "Probability Distribution of Smoking Prevalence",
+       subtitle = "Sheffield is likely to have much lower prevalence than other S. Yorkshire LAs",
+       color = "Local Authority",
+       fill = "Local Authority") +
+  theme(legend.position = "bottom") +
+  scale_x_continuous(breaks = seq(10,26,1), minor_breaks = NULL)
+```
+
+
+### Income 
+
+Income data is produced by the [Office for National Statistics (ONS)](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales). The data used is 2018 modelled average income at the medium super output area (MSOA) level, which can be matched to local authority districts. To get average income at the local authority level, a simple unweighted mean is taken across constitutent MSOAs. 
+
+In order to retain uncertainty information on the income figures, the MSOA level figure and confidence intervals are used to simulate the mean and standard deviation of the local authority district level income measures calculated.
+
+We are able to produce three income measures:
+
+1. Net annual income 
+1. Net annual income equivalised using OECD equivalence scales ([see here](https://www.oecd.org/economy/growth/OECD-Note-EquivalenceScales.pdf))
+1. Net annual income equivalised using OECD equivalence scales __after housing costs__
+
+## Workflow 
+
+
+### Data Preparation
+
+```{r data_clean, eval = FALSE }
+## name of the data file for wave 174 of toolkit (April 2021)
+data <- "omni174_39.1_65.2cot_31.3a_25.4s_recodes_60.5sa.sav"
+
+## file path to where the raw data is stored
+path <- "C:/Users/cm1djm/Documents/GitLab Projects/SPECTRUM/Projects/smoke free dividend/input_data/"
+
+## read in the raw SPSS data file
+toolkit_raw <- smkfreediv::ReadToolkit(path = path,
+                                       data = data,
+                                       save = TRUE)
+
+## clean the data and use April 2014 to February 2019 data
+toolkit_clean <- smkfreediv::CleanToolkit(data = toolkit_raw,
+                                          start_month = 90,
+                                          end_month = 160)
+
+```
+
+### Simulation
+

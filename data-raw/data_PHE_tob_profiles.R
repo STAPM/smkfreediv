@@ -19,22 +19,45 @@ setnames(profiles,
 ## the prevalence estimate and number of smokers, then applying the prevalence confidence
 ## intervals to the total population
 
+## calculate population size, and smoking prevalence standard error
+
 profiles[, pop_n := round(n_smokers/(smk_prev/100))]
-
-profiles[, n_smokers_uci := round(pop_n * (smk_prev_uci/100)) ]
-profiles[, n_smokers_lci := round(pop_n * (smk_prev_lci/100)) ]
-
-## get standard errors (normal distribution)
-
-profiles[, n_smokers_se := round((n_smokers_uci - n_smokers)/1.96)]
 profiles[, smk_prev_se := round((smk_prev_uci - smk_prev)/1.96,4)]
 
-sum(profiles$n_smokers, na.rm = T)
+## simulate smoking prevalence to calculate standard error of the number of smokers
+
+reps <- 50000
+
+m_n_smokers     = matrix(rep(NA, 151*reps), ncol = reps)
+
+for (i in 1:reps) {
+
+  cat("\t\t1. Simulating Number of Smokers", round(100*i/reps,2),"%", "               \r")
+  utils::flush.console()
+  if(i == reps) { cat("\n") }
+
+  sim_data <- copy(profiles)
+
+  sim_data[, prob_smk_prev := rnorm(1, smk_prev, smk_prev_se), by = "UTLAname"]
+  sim_data[, prob_n_smokers := pop_n * (prob_smk_prev/100)]
+
+  m_n_smokers[,i] <- as.vector(as.matrix(sim_data[,"prob_n_smokers"]))
+
+}
+
+m_n_smokers     <- data.table(m_n_smokers)
+m_s <- transform(m_n_smokers, n_smokers_se=apply(m_n_smokers,1, sd, na.rm = TRUE))
+
+m_n_smokers   <- m_s[,"n_smokers_se"]
+
+############# Tidy data and save out
+
+profiles <- cbind(profiles,m_n_smokers)
 
 profiles <- profiles[,c("UTLAcode","UTLAname","pop_n",
-                        "smk_prev","smk_prev_uci","smk_prev_lci","smk_prev_se",
-                        "n_smokers","n_smokers_uci","n_smokers_lci","n_smokers_se")]
+                        "smk_prev","smk_prev_se",
+                        "n_smokers","n_smokers_se")]
 
-tobacco_profiles <- profiles
+tobacco_profiles <- copy(profiles)
 
 usethis::use_data(tobacco_profiles, overwrite = TRUE)

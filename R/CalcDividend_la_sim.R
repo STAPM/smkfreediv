@@ -257,7 +257,7 @@ CalcDividend_la_sim <- function(data,
 
   data_out <- cbind(data_out, m_income, m_n_smokers, m_smk_prev, m_mean_week_spend,
                     m_spend_prop, m_spend_prop_up, m_total_wk_exp, m_total_wk_exp_up,
-                    m_total_annual_exp, m_total_annual_exp_up)
+                    m_total_annual_exp, m_total_annual_exp_up, m_mean_week_spend_up)
 
   cat(crayon::green("done\n"))
 

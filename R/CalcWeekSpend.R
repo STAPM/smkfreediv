@@ -42,19 +42,7 @@ CalcWeekSpend <- function(data,
   ## drop non-English local authorities
   data_out <- t[substring(UTLAcode,1,1) == "E",]
 
-  ### tidy up so the names and codes match exactly to the tobacco profiles
 
-  # name of Buckinghamshire
-  data_out[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
-
-  # fix mis-match of Bristol naming
-  data_out[UTLAcode == "E06000023", UTLAname := "Bristol"]
-
-  # fix mis-match of Kingston upon Hull naming
-  data_out[UTLAcode == "E06000010", UTLAname := "Kingston upon Hull"]
-
-  # fix mis-match of Herefordshire naming
-  data_out[UTLAcode == "E06000019", UTLAname := "Herefordshire"]
 
   return(data_out)
 }

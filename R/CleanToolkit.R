@@ -93,7 +93,27 @@ CleanToolkit <- function(data = data,
   # read in the mapping from LTLA to UTLA
 
   data[, LAcode := stringr::str_trim(LAcode)]
-  merged <- merge(data, smkfreediv::localauthorities, by = c("LAcode"), all.x = TRUE, sort = FALSE)
+  data_out <- merge(data, smkfreediv::localauthorities, by = c("LAcode"), all = TRUE, sort = FALSE)
 
-  return(merged)
+  ### tidy up so the names and codes match exactly to the tobacco profiles
+
+  # name of Buckinghamshire
+  data_out[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
+
+  # Buckinghamshire code
+  data_out[UTLAcode == "E10000002", UTLAcode := "E06000060"]
+
+  # fix mis-match of Bristol naming
+  data_out[UTLAcode == "E06000023", UTLAname := "Bristol"]
+
+  # fix mis-match of Kingston upon Hull naming
+  data_out[UTLAcode == "E06000010", UTLAname := "Kingston upon Hull"]
+
+  # fix mis-match of Herefordshire naming
+  data_out[UTLAcode == "E06000019", UTLAname := "Herefordshire"]
+
+  # Dorset code
+  data_out[UTLAcode == "E10000009", UTLAcode := "E06000059"]
+
+  return(data_out)
 }

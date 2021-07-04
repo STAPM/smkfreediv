@@ -1,19 +1,9 @@
 library(data.table)
+library(readxl)
 
-profiles <- read.csv("data-raw/PHE tobacco profiles 2019.csv")
+profiles <- read_excel("data-raw/PHW tobacco profiles 2020.xlsx",range = "C1:K23")
 setDT(profiles)
 
-profiles <- profiles[Area.Code != "E92000001",]
-
-profiles <- profiles[,c("AreaName","Area.Code","Value",
-                        "Upper.CI.95.0.limit","Lower.CI.95.0.limit",
-                        "Count")]
-
-profiles[, Count := as.numeric(gsub(",","",Count))]
-
-setnames(profiles,
-         names(profiles),
-         c("UTLAname","UTLAcode","smk_prev","smk_prev_uci","smk_prev_lci","n_smokers"))
 
 ## get confidence interval on the number of smokers by backing out the population from
 ## the prevalence estimate and number of smokers, then applying the prevalence confidence
@@ -21,14 +11,16 @@ setnames(profiles,
 
 ## calculate population size, and smoking prevalence standard error
 
-profiles[, pop_n := round(n_smokers/(smk_prev/100))]
-profiles[, smk_prev_se := round((smk_prev_uci - smk_prev)/1.96,4)]
+profiles[, n_smokers := round(pop_n * (Rate/100))]
+profiles[, smk_prev_se := round((UpperCI - Rate)/1.96,4)]
+
+setnames(profiles, c("Area","Code","Rate"), c("UTLAname","UTLAcode","smk_prev"))
 
 ## simulate smoking prevalence to calculate standard error of the number of smokers
 
 reps <- 50000
 
-m_n_smokers     = matrix(rep(NA, 151*reps), ncol = reps)
+m_n_smokers     = matrix(rep(NA, 22*reps), ncol = reps)
 
 for (i in 1:reps) {
 
@@ -58,6 +50,6 @@ profiles <- profiles[,c("UTLAcode","UTLAname","pop_n",
                         "smk_prev","smk_prev_se",
                         "n_smokers","n_smokers_se")]
 
-PHE_tobacco_profiles <- copy(profiles)
+PHW_tobacco_profiles <- copy(profiles)
 
-usethis::use_data(PHE_tobacco_profiles, overwrite = TRUE)
+usethis::use_data(PHW_tobacco_profiles, overwrite = TRUE)

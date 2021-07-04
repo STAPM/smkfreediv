@@ -27,10 +27,20 @@
 
 #' PHE Tobacco Profiles.
 #'
-#' A dataset containing smoking prevalence figures for upper tier local authorities in
+#' A dataset containing smoking prevalence figures for 151 upper tier local authorities in
 #' England, produced by Public Health England. Figures include smoking prevalence and
-#' total number of smokers, including 95% confidence intervals and standard errors for both.
+#' total number of smokers, and standard errors for both.
 #'
 #' @format
 #' @source \href{https://fingertips.phe.org.uk/profile/tobacco-control/data#page/0}{PHE local tobacco profiles}
-"tobacco_profiles"
+"PHE_tobacco_profiles"
+
+#' PHW Tobacco Profiles.
+#'
+#' A dataset containing smoking prevalence figures for the 22 local authorities in
+#' Wales, produced by Public Health Wales. Figures include smoking prevalence and
+#' total number of smokers, and standard errors for both.
+#'
+#' @format
+#' @source \href{https://publichealthwales.shinyapps.io/smokinginwales/}{PHW local tobacco profiles}
+"PHW_tobacco_profiles"

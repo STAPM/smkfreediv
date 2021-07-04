@@ -74,5 +74,22 @@ GetIncome <- function(mapping_data = smkfreediv::localauthorities,
 
   data_out <- data_out[order(UTLAname)]
 
+  ### tidy up so the names and codes match exactly to the tobacco profiles
+
+  data_out[UTLAname == "Buckinghamshire", UTLAcode := "E06000060"]
+  data_out[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
+
+  # fix mis-match of Bristol naming
+  data_out[UTLAcode == "E06000023", UTLAname := "Bristol"]
+
+  # fix mis-match of Kingston upon Hull naming
+  data_out[UTLAcode == "E06000010", UTLAname := "Kingston upon Hull"]
+
+  # fix mis-match of Herefordshire naming
+  data_out[UTLAcode == "E06000019", UTLAname := "Herefordshire"]
+
+  # Dorset codes
+  data_out[UTLAcode == "E10000009", UTLAcode := "E06000059"]
+
   return(data_out)
 }

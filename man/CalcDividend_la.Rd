@@ -5,11 +5,12 @@
 \title{Calculate Local Authority Level Dividend}
 \usage{
 CalcDividend_la(
-  profiles = smkfreediv::tobacco_profiles,
+  profiles = smkfreediv::PHE_tobacco_profiles,
   clean_income,
   clean_expenditure,
   upshift = 1.57151042,
-  div = 0.93
+  div = 0.93,
+  prob = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ CalcDividend_la(
 \item{upshift}{Numeric. Parameter to upshift expenditures calculated from the toolkit data.}
 
 \item{div}{Numeric. Proportion of expenditure paid in tax.}
+
+\item{prob}{Character. If TRUE draws inputs to the dividend calculation probabilistically}
 }
 \value{
 

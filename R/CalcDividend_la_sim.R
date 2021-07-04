@@ -29,10 +29,27 @@ CalcDividend_la_sim <- function(data,
   ## Calculate mean weekly expenditure by upper-tier local authority
   cat(crayon::green("Calculating Local Authority Smokefree Dividends\n"))
 
-  mean_spend_la <- smkfreediv::CalcWeekSpend(data = data,
-                                             strat_vars = c("UTLAcode","UTLAname"))
+  exp <- smkfreediv::CalcWeekSpend(data = data,
+                                   strat_vars = c("UTLAcode","UTLAname"))
 
-  mean_spend_la <- mean_spend_la[order(UTLAname)]
+  exp <- exp[order(UTLAname)]
+
+  ## Grab income data
+
+  income <- smkfreediv::GetIncome(mapping_data = smkfreediv::localauthorities,
+                                  income_data = smkfreediv::la_inc_pop,
+                                  income_var = 3)
+
+  ######## DETERMINISTIC CALCULATION
+
+  div_la_det <- CalcDividend_la(profiles = smkfreediv::PHE_tobacco_profiles,
+                                clean_income = income,
+                                clean_expenditure = exp,
+                                upshift = upshift,
+                                div = div,
+                                prob = FALSE)
+
+  ######## PROBABILISTIC CALCULATION
 
   ## Initialise matrices for probabilistic variables
 
@@ -56,20 +73,22 @@ CalcDividend_la_sim <- function(data,
     cat("\t\tSimulating...", round(100*i/n_sim,2),"%", "               \r")
     utils::flush.console()
     if(i == n_sim) { cat("\n") }
-    ## Grab the income data
 
-    income <- smkfreediv::GetIncome(mapping_data = smkfreediv::localauthorities,
+    ## Grab the income data, including a probabilistically drawn mean income
+
+    income_prob <- smkfreediv::GetIncome(mapping_data = smkfreediv::localauthorities,
                                     income_data = smkfreediv::la_inc_pop,
                                     income_var = 3)
 
     ## Use the income/spending to calculate the smoke free dividend for
     ## each local authority.
 
-    div_la <- CalcDividend_la(profiles = smkfreediv::tobacco_profiles,
-                              clean_income = income,
-                              clean_expenditure = mean_spend_la,
-                              upshift = 1.57151042,
-                              div = 0.93)
+    div_la <- CalcDividend_la(profiles = smkfreediv::PHE_tobacco_profiles,
+                              clean_income = income_prob,
+                              clean_expenditure = exp,
+                              upshift = upshift,
+                              div = div,
+                              prob = TRUE)
 
     ## save out probabilistic results
 
@@ -248,14 +267,9 @@ CalcDividend_la_sim <- function(data,
   rm(m_m, m_s, m)
   gc()
 
-  ### Combine data
+  ### Combine deterministic/probabilistic data
 
-  data_out <- div_la[, c("prob_n_smokers","prob_smk_prev","prob_mean_week_spend","prob_income",
-                         "prob_total_wk_exp","prob_total_annual_exp",
-                         "prob_spend_prop","prob_mean_week_spend_up","prob_total_wk_exp_up",
-                         "prob_total_annual_exp_up","prob_spend_prop_up","prob_dividend") := NULL]
-
-  data_out <- cbind(data_out, m_income, m_n_smokers, m_smk_prev, m_mean_week_spend,
+  data_out <- cbind(div_la_det, m_income, m_n_smokers, m_smk_prev, m_mean_week_spend,
                     m_spend_prop, m_spend_prop_up, m_total_wk_exp, m_total_wk_exp_up,
                     m_total_annual_exp, m_total_annual_exp_up)
 

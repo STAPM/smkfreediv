@@ -80,8 +80,10 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
        by = "UTLAcode"]
 
   # 3) mean weekly spend
-  # small hack - if NA standard deviation for only one observations, set SE = MEAN
-  prob[!is.na(mean_week_spend) & is.na(se_week_spend), se_week_spend := mean_week_spend]
+  # small hack - if NA standard deviation for only one observations, set SE = MEAN/1.96
+  #            - this increases standard deviation by as much as possible without allowing
+  #              the lower confidence interval to fall below 0 (affects Bracknell Forest)
+  prob[!is.na(mean_week_spend) & is.na(se_week_spend), se_week_spend := mean_week_spend/1.96]
   prob[!is.na(mean_week_spend),
        prob_mean_week_spend := rnorm(1,mean = mean_week_spend, sd = se_week_spend) ,
        by = "UTLAcode"]

@@ -115,5 +115,9 @@ CleanToolkit <- function(data = data,
   # Dorset code
   data_out[UTLAcode == "E10000009", UTLAcode := "E06000059"]
 
+
+  ## drop non-English local authorities
+  data_out <- data_out[substring(UTLAcode,1,1) == "E",]
+
   return(data_out)
 }

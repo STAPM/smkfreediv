@@ -4,6 +4,7 @@
 #'
 #' @param data Data table. The cleaned toolkit data.
 #' @param strat_vars Character vector. Variables over which to calculate the weekly mean expenditure
+#' @param upshift Numeric. Parameter to upshift expenditures calculated from the toolkit data.
 #'
 #' @importFrom data.table := copy rbindlist setDT
 #'
@@ -16,7 +17,11 @@
 #'
 #' }
 CalcWeekSpend <- function(data,
-                      strat_vars) {
+                          strat_vars,
+                          upshift = 1) {
+
+  ### apply upshift factor to mean weekly spending
+  data[, weekspend := weekspend*upshift]
 
   ### only keep observations which are not missing for strat_vars
 
@@ -33,16 +38,11 @@ CalcWeekSpend <- function(data,
 
   data[, sample := ifelse(is.na(weekspend), 0, 1)]
 
-  t <- data[, .(mean_week_spend = weighted.mean(weekspend, w = Aweight0 ,na.rm = T),
+  data_out <- data[, .(mean_week_spend = weighted.mean(weekspend, w = Aweight0 ,na.rm = T),
                 se_week_spend = sd(weekspend, na.rm = T)/sqrt(.N),
                 sample_tkit = sum(sample)
                 ),
             by = strat_vars]
-
-  ## drop non-English local authorities
-  data_out <- t[substring(UTLAcode,1,1) == "E",]
-
-
 
   return(data_out)
 }

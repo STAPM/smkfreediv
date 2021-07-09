@@ -2,6 +2,7 @@
 
 export(CalcDividend_la)
 export(CalcDividend_la_sim)
+export(CalcUpshift)
 export(CalcWeekSpend)
 export(CleanToolkit)
 export(GetIncome)

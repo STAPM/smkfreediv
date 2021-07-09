@@ -44,3 +44,19 @@
 #' @format
 #' @source \href{https://publichealthwales.shinyapps.io/smokinginwales/}{PHW local tobacco profiles}
 "PHW_tobacco_profiles"
+
+#' Population.
+#'
+#' Mid-2018 ONS population estimates by age and sex.
+#'
+#' @format
+#' @source \href{https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland}{Population Data by age, gender, local authority}
+"pop_counts"
+
+#' Price of Cigarettes
+#'
+#' Monthly time series of the price of a pack of 20 cigarettes from the ONS
+#'
+#' @format
+#' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp}{ONS Cigarette prices}
+"price_cigs"

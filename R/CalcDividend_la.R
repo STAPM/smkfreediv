@@ -5,7 +5,6 @@
 #' @param profiles PHE local tobacco profiles.
 #' @param clean_income Data table. Cleaned income data.
 #' @param clean_expenditure Data table. Cleaned local authority level weekly expenditure.
-#' @param upshift Numeric. Parameter to upshift expenditures calculated from the toolkit data.
 #' @param div Numeric. Proportion of expenditure paid in tax.
 #' @param prob Character. If TRUE draws inputs to the dividend calculation probabilistically
 #'
@@ -20,7 +19,6 @@
 CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
                             clean_income ,
                             clean_expenditure ,
-                            upshift = 1.57151042,
                             div = 0.93,
                             prob = FALSE) {
 
@@ -42,20 +40,12 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
   det <- copy(merged_all)
 
-  det[, mean_week_spend_up := mean_week_spend * upshift]
-
   det[, total_wk_exp := round((n_smokers * mean_week_spend)/1000)]
   det[, total_annual_exp := round((n_smokers * mean_week_spend * 52)/1000000)]
 
   det[, spend_prop := (mean_week_spend * 52)/income]
 
-  det[, mean_week_spend_up := mean_week_spend * upshift]
-  det[, total_wk_exp_up := round((n_smokers * mean_week_spend * upshift)/1000)]
-  det[, total_annual_exp_up := round((n_smokers * mean_week_spend * 52  * upshift)/1000000)]
-
-  det[, spend_prop_up := (mean_week_spend_up * 52)/income]
-
-  det[, dividend := total_annual_exp_up * div]
+  det[, dividend := total_annual_exp * div]
 
   det[, c("smk_prev_se","income_sim", "n_smokers_se",
           "se_week_spend", "population", "sample_tkit") := NULL]
@@ -94,20 +84,12 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
   ### repeat upshifting/dividend calculations with the
   ### probabilistically drawn values
 
-  prob[, prob_mean_week_spend_up := prob_mean_week_spend * upshift]
-
   prob[, prob_total_wk_exp := round((prob_n_smokers * prob_mean_week_spend)/1000)]
   prob[, prob_total_annual_exp := round((prob_n_smokers * prob_mean_week_spend * 52)/1000000)]
 
   prob[, prob_spend_prop := (prob_mean_week_spend * 52)/prob_income]
 
-  prob[, prob_mean_week_spend_up := prob_mean_week_spend * upshift]
-  prob[, prob_total_wk_exp_up := round((prob_n_smokers * prob_mean_week_spend * upshift)/1000)]
-  prob[, prob_total_annual_exp_up := round((prob_n_smokers * prob_mean_week_spend * 52  * upshift)/1000000)]
-
-  prob[, prob_spend_prop_up := (prob_mean_week_spend_up * 52)/income]
-
-  prob[, prob_dividend := prob_total_annual_exp_up * div]
+  prob[, prob_dividend := prob_total_annual_exp * div]
 
   prob[, c("smk_prev", "smk_prev_se", "n_smokers", "n_smokers_se",
            "se_week_spend", "mean_week_spend","sample_tkit",

@@ -8,7 +8,6 @@ CalcDividend_la(
   profiles = smkfreediv::PHE_tobacco_profiles,
   clean_income,
   clean_expenditure,
-  upshift = 1.57151042,
   div = 0.93,
   prob = FALSE
 )
@@ -19,8 +18,6 @@ CalcDividend_la(
 \item{clean_income}{Data table. Cleaned income data.}
 
 \item{clean_expenditure}{Data table. Cleaned local authority level weekly expenditure.}
-
-\item{upshift}{Numeric. Parameter to upshift expenditures calculated from the toolkit data.}
 
 \item{div}{Numeric. Proportion of expenditure paid in tax.}
 

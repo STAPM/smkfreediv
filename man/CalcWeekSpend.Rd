@@ -4,12 +4,14 @@
 \alias{CalcWeekSpend}
 \title{Weekly Tobacco Spend}
 \usage{
-CalcWeekSpend(data, strat_vars)
+CalcWeekSpend(data, strat_vars, upshift = 1)
 }
 \arguments{
 \item{data}{Data table. The cleaned toolkit data.}
 
 \item{strat_vars}{Character vector. Variables over which to calculate the weekly mean expenditure}
+
+\item{upshift}{Numeric. Parameter to upshift expenditures calculated from the toolkit data.}
 }
 \value{
 

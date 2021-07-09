@@ -111,7 +111,7 @@ if (LCFS == TRUE) {
   upshift <- total_annual_spend_hmrc/5522
 
 } else {
-  upshift <- total_annual_spend_hmrc/total_annual_spend/1000000
+  upshift <- total_annual_spend_hmrc/(total_annual_spend/1000000)
 }
 
 return(upshift)

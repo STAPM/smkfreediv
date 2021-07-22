@@ -7,7 +7,7 @@ Authors@R: person(given = "Damon",
            role = c("aut","cre"),
            email = "d.j.morris@sheffield.ac.uk",
            comment = c(ORCID = "0000-0001-6757-5333"))
-Maintainer: Damon Morris <d.j.morris@sheffield.ac.ukt>
+Maintainer: Damon Morris <d.j.morris@sheffield.ac.uk>
 Description: Uses the Smoking Toolkit Study and ONS data to produce estimates
     of tobacco spending by local authority and other socio-economic breakdowns to
     calculate the potential dividend to local areas from individuals quitting smoking

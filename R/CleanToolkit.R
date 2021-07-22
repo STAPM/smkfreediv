@@ -86,7 +86,7 @@ CleanToolkit <- function(data = data,
 
   data[ , Ageband := c("16-24", "25-34", "35-44", "45-54", "55-64", "65+")[findInterval(Age, c(16, 25, 35, 45, 55, 65, 1000))]]
 
-  data[, Agevabd := factor(Ageband, levels = c("16-24", "25-34", "35-44", "45-54", "55-64", "65+"))]
+  data[, Ageband := factor(Ageband, levels = c("16-24", "25-34", "35-44", "45-54", "55-64", "65+"))]
 
   ### GENERATE LOCAL AUTHORITY NAMES
 

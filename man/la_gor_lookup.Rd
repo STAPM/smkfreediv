@@ -5,7 +5,7 @@
 \alias{la_gor_lookup}
 \title{Local Authority to Region Lookup}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 348 rows and 4 columns.
 }
 \usage{
 la_gor_lookup

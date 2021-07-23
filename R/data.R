@@ -1,8 +1,17 @@
+#' CPI Index for Tobacco
+#'
+#' Consumer price index time series for tobacco products.
+#'
+#'
+#' @format
+#' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7cb/mm23}{Tobacco CPI time series}
+"cpi_tobacco"
+
 #' Local Authority to Region Lookup
 #'
 #' A lookup table to match local authority districts to government office region geographies.
 #'
-#' @format
+#'
 "la_gor_lookup"
 
 #' Local Authority Data.

@@ -9,9 +9,9 @@ CleanToolkit(data = data, start_month, end_month)
 \arguments{
 \item{data}{Data table. Toolkit data.}
 
-\item{start_month}{Start month for the analysis period}
+\item{start_month}{Numeric. Toolkit tart month for the analysis period.}
 
-\item{end_month}{End month for the analysis period}
+\item{end_month}{Numeric. Toolkit end month for the analysis period.}
 }
 \value{
 

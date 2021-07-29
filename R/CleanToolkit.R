@@ -4,8 +4,8 @@
 #' smoke free dividend calculations
 #'
 #' @param data Data table. Toolkit data.
-#' @param start_month Start month for the analysis period
-#' @param end_month End month for the analysis period
+#' @param start_month Numeric. Toolkit tart month for the analysis period.
+#' @param end_month Numeric. Toolkit end month for the analysis period.
 #'
 #' @importFrom data.table := copy rbindlist setDT
 #'
@@ -42,7 +42,8 @@ CleanToolkit <- function(data = data,
                    q632x1, q632a9_1, q632a0_1, q632b1_1
   )]
 
-  #### time variables
+  #######################
+  #### TIME VARIABLES
 
   data[month %in% c(   3,  15, 27, 39, 51, 63, 75, 87, 99,  111, 123, 135, 147, 159, 171 ), Month :=  "January"]
   data[month %in% c(   4,  16, 28, 40, 52, 64, 76, 88, 100, 112, 124, 136, 148, 160, 172 ), Month :=  "February"]
@@ -76,7 +77,8 @@ CleanToolkit <- function(data = data,
 
   data <- data[month %in% start_month:end_month,]
 
-  ## factor variables
+  ################################
+  ## SOCIO-ECONOMIC VARIABLES
 
   data[, gor := factor(gor, levels = c("North East","North West","Yorkshire and The Humber",
                                        "East Midlands","West Midlands","East of England",
@@ -88,7 +90,8 @@ CleanToolkit <- function(data = data,
 
   data[, Ageband := factor(Ageband, levels = c("16-24", "25-34", "35-44", "45-54", "55-64", "65+"))]
 
-  ### GENERATE LOCAL AUTHORITY NAMES
+  ############################################################################
+  ### GENERATE LOCAL AUTHORITY NAMES AND CLEAN TO MATCH OTHER DATA SOURCES ###
 
   # read in the mapping from LTLA to UTLA
 

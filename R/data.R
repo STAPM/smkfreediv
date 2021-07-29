@@ -69,3 +69,10 @@
 #' @format
 #' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp}{ONS Cigarette prices}
 "price_cigs"
+
+#' Upper Tier Local Authority to Region Lookup
+#'
+#' A lookup table to match local authority districts to government office region geographies.
+#'
+#'
+"utla_gor_lookup"

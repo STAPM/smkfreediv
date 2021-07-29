@@ -20,15 +20,17 @@ CalcWeekSpend <- function(data,
                           strat_vars,
                           upshift = 1) {
 
+  mean_calcs <- copy(data)
+
   ### apply upshift factor to mean weekly spending
-  data[, weekspend := weekspend*upshift]
+  mean_calcs[, weekspend := weekspend * upshift]
 
   ### only keep observations which are not missing for strat_vars
 
   for(cv in strat_vars) {
 
-    if(cv %in% colnames(data)) {
-      data <- data[!is.na(get(cv))]
+    if(cv %in% colnames(mean_calcs)) {
+      mean_calcs <- mean_calcs[!is.na(get(cv))]
     } else {
       warning(cv, " not a column in the data")
     }
@@ -36,9 +38,9 @@ CalcWeekSpend <- function(data,
   }
     ### calculate the mean
 
-  data[, sample := ifelse(is.na(weekspend), 0, 1)]
+  mean_calcs[, sample := ifelse(is.na(weekspend), 0, 1)]
 
-  data_out <- data[, .(mean_week_spend = weighted.mean(weekspend, w = Aweight0 ,na.rm = T),
+  data_out <- mean_calcs[, .(mean_week_spend = weighted.mean(weekspend, w = Aweight0 ,na.rm = T),
                 se_week_spend = sd(weekspend, na.rm = T)/sqrt(.N),
                 sample_tkit = sum(sample)
                 ),

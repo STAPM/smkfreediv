@@ -31,15 +31,19 @@ CleanToolkit <- function(data = data,
                    qual,           # highest qualification
                    tenure,        # housing tenure
                    gor = gore, # government office region
+                   grade,      # social grade
+                   work,       # working status
+                   ethnic,     # ethnicity
                    LAcode,     # local authority code
+                   daily,      # current daily smoker
                    Smoker = smoker,   # smoking status
                    ExSmoker = exsmoker,
 
                    ### expenditures
-                   weekspend,
+                   weekspend
 
                    ### consumption/dependence
-                   q632x1, q632a9_1, q632a0_1, q632b1_1
+                   # q632x1, q632a9_1, q632a0_1, q632b1_1
   )]
 
   #######################
@@ -89,6 +93,32 @@ CleanToolkit <- function(data = data,
   data[ , Ageband := c("16-24", "25-34", "35-44", "45-54", "55-64", "65+")[findInterval(Age, c(16, 25, 35, 45, 55, 65, 1000))]]
 
   data[, Ageband := factor(Ageband, levels = c("16-24", "25-34", "35-44", "45-54", "55-64", "65+"))]
+
+  data[grade %in% c("AB","C1"), grade_2cat := "ABC1"]
+  data[grade %in% c("C2","D","E"), grade_2cat := "C2DE"]
+
+  data[work %in% c("HAVE PAID JOB - FULL TIME (30+ HOURS PER WEEK)"),lmstatus := "Employed Full-Time"]
+  data[work %in% c("HAVE PAID JOB - PART TIME (8-29 HOURS PER WEEK)",
+                   "HAVE PAID JOB - PART TIME (UNDER 8 HOURS PER WEEK)"),lmstatus := "Employed Part-Time"]
+  data[work %in% c("SELF-EMPLOYED"),lmstatus := "Self-Employed"]
+  data[work %in% c("UNEMPLOYED AND SEEKING WORK"),lmstatus := "Unemployed"]
+  data[work %in% c("FULL TIME STUDENT",
+                   "STILL AT SCHOOL"),lmstatus := "Education"]
+  data[work %in% c("RETIRED"),lmstatus := "Retired"]
+  data[work %in% c("NOT WORKING - HOUSEWIFE/HUSBAND",
+                   "NOT IN PAID WORK FOR OTHER REASON",
+                   "NOT IN PAID WORK BECAUSE OF LONG TERM ILLNESS OR DISABILITY"),lmstatus := "Other Inactive"]
+
+  data[lmstatus %in% c("Employed Full-Time",
+                       "Employed Part-Time",
+                       "Self-Employed"), lmstatus_3cat := "Employed"]
+
+  data[lmstatus %in% c("Unemployed"), lmstatus_3cat := "Unemployed"]
+
+  data[!(lmstatus %in% c("Employed Full-Time",
+                         "Employed Part-Time",
+                         "Self-Employed",
+                         "Unemployed")), lmstatus_3cat := "Inactive"]
 
   ############################################################################
   ### GENERATE LOCAL AUTHORITY NAMES AND CLEAN TO MATCH OTHER DATA SOURCES ###

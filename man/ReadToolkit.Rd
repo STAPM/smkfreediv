@@ -4,7 +4,7 @@
 \alias{ReadToolkit}
 \title{Read Toolkit Data}
 \usage{
-ReadToolkit(path, data, save = T)
+ReadToolkit(path, data, save = TRUE, name)
 }
 \arguments{
 \item{path}{path to the directory where the raw SPSS data is saved}
@@ -12,6 +12,8 @@ ReadToolkit(path, data, save = T)
 \item{data}{name of the data file (defaults to the April 2021 version)}
 
 \item{save}{Logical. If TRUE, saves out a copy of the data in RDS format}
+
+\item{name}{Character. Name of the file to export}
 }
 \value{
 

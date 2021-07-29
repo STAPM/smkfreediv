@@ -31,7 +31,7 @@ CleanToolkit <- function(data = data,
                    qual,           # highest qualification
                    tenure,        # housing tenure
                    gor = gore, # government office region
-                   grade,      # social grade
+                   grade = sgz ,      # social grade
                    work,       # working status
                    ethnic,     # ethnicity
                    LAcode,     # local authority code
@@ -84,9 +84,13 @@ CleanToolkit <- function(data = data,
   ################################
   ## SOCIO-ECONOMIC VARIABLES
 
+  ## region
+
   data[, gor := factor(gor, levels = c("North East","North West","Yorkshire and The Humber",
                                        "East Midlands","West Midlands","East of England",
                                        "London","South East","South West"))]
+
+  ## age and sex
 
   data[, Sex := factor(Sex, levels = c("Men","Women"), labels = c("Male","Female"))]
 
@@ -94,8 +98,15 @@ CleanToolkit <- function(data = data,
 
   data[, Ageband := factor(Ageband, levels = c("16-24", "25-34", "35-44", "45-54", "55-64", "65+"))]
 
+  ## social grade
+
   data[grade %in% c("AB","C1"), grade_2cat := "ABC1"]
   data[grade %in% c("C2","D","E"), grade_2cat := "C2DE"]
+
+  data[, grade := factor(grade, levels = c("AB", "C1", "C2", "D", "E"))]
+  data[, grade_2cat := factor(grade_2cat, levels = c("ABC1", "C2DE"))]
+
+  ## labour market status
 
   data[work %in% c("HAVE PAID JOB - FULL TIME (30+ HOURS PER WEEK)"),lmstatus := "Employed Full-Time"]
   data[work %in% c("HAVE PAID JOB - PART TIME (8-29 HOURS PER WEEK)",
@@ -119,6 +130,26 @@ CleanToolkit <- function(data = data,
                          "Employed Part-Time",
                          "Self-Employed",
                          "Unemployed")), lmstatus_3cat := "Inactive"]
+
+  data[, lmstatus := factor(lmstatus, levels = c("Employed Full-Time",
+                                                 "Employed Part-Time",
+                                                 "Self-Employed",
+                                                 "Unemployed",
+                                                 "Education","Retired","Other Inactive"))]
+
+  data[, lmstatus_3cat := factor(lmstatus_3cat, levels = c("Employed",
+                                                 "Unemployed",
+                                                 "Inactive"))]
+
+  ## ethnicity
+
+
+  data[ethnic %in% c("WHITE BRITISH","WHITE OTHER","WHITE IRISH","WHITE GYPSY /TRAVELLER"), ethnicity := "White"]
+  data[!(ethnic %in% c("WHITE BRITISH","WHITE OTHER","WHITE IRISH","WHITE GYPSY /TRAVELLER")), ethnicity := "Non-White"]
+
+  data[, ethnicity := factor(ethnicity, levels = c("White","Non-White"))]
+
+  data[, c("work","ethnic") := NULL]
 
   ############################################################################
   ### GENERATE LOCAL AUTHORITY NAMES AND CLEAN TO MATCH OTHER DATA SOURCES ###

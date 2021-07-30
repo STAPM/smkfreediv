@@ -81,9 +81,9 @@ total_annual_spend <- sum(merge$tot_annual_exp, na.rm = TRUE)
 
 total_excise_per_pack <- avt_fm*price_fm + (duty_fm/50)
 
-excise_pct <- total_excise_per_pack/price_fm
+excise_pct_fm <- total_excise_per_pack/price_fm
 
-tot_spend_fm <- round(tot_duty_fm/excise_pct)
+tot_spend_fm <- round(tot_duty_fm/excise_pct_fm)
 
 ## RYO tob
 
@@ -96,9 +96,9 @@ deflator <- to_yr/frm_yr
 
 total_excise_per_100g <- (duty_ryo/10)
 
-excise_pct <- total_excise_per_100g/(price_ryo*deflator)
+excise_pct_ryo <- total_excise_per_100g/(price_ryo*deflator)
 
-tot_spend_ryo <- round(tot_duty_ryo/excise_pct)
+tot_spend_ryo <- round(tot_duty_ryo/excise_pct_ryo)
 
 ## sum up
 
@@ -109,10 +109,29 @@ total_annual_spend_hmrc <- tot_spend_fm + tot_spend_ryo
 
 if (LCFS == TRUE) {
   upshift <- total_annual_spend_hmrc/5522
+  total_annual_spend_surv <- 5522
 
 } else {
   upshift <- total_annual_spend_hmrc/(total_annual_spend/1000000)
+  total_annual_spend_surv <- (total_annual_spend/1000000)
 }
 
-return(upshift)
+return(list(upshift = upshift,
+            tot_duty_fm = tot_duty_fm,
+            price_fm = price_fm,
+            duty_fm = duty_fm/50,
+            avt  = avt_fm*price_fm,
+            total_excise_per_pack = total_excise_per_pack,
+            excise_pct_fm = excise_pct_fm,
+            tot_spend_fm = tot_spend_fm,
+            tot_duty_ryo = tot_duty_ryo,
+            price_ryo = price_ryo,
+            price_ryo_d = price_ryo*deflator,
+            duty_ryo = duty_ryo/10,
+            excise_pct_ryo = excise_pct_ryo,
+            tot_spend_ryo = tot_spend_ryo,
+            total_annual_spend_hmrc = total_annual_spend_hmrc,
+            total_annual_spend_surv = total_annual_spend_surv
+            ))
 }
+

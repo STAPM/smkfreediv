@@ -138,7 +138,8 @@ return(list(upshift = upshift,
             excise_pct_ryo = excise_pct_ryo,
             tot_spend_ryo = tot_spend_ryo,
             total_annual_spend_hmrc = total_annual_spend_hmrc,
-            total_annual_spend_surv = total_annual_spend_surv
+            total_annual_spend_surv = total_annual_spend_surv,
+            svy_data = source,
             ))
 }
 

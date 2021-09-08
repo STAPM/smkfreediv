@@ -110,24 +110,31 @@ total_annual_spend_hmrc <- tot_spend_fm + tot_spend_ryo
 if (LCFS == TRUE) {
   upshift <- total_annual_spend_hmrc/5522
   total_annual_spend_surv <- 5522
+  source = "LCFS"
 
 } else {
   upshift <- total_annual_spend_hmrc/(total_annual_spend/1000000)
   total_annual_spend_surv <- (total_annual_spend/1000000)
+  source = "Toolkit"
+
 }
 
 return(list(upshift = upshift,
             tot_duty_fm = tot_duty_fm,
             price_fm = price_fm,
-            duty_fm = duty_fm/50,
+            duty_fm = duty_fm,
+            duty_fm_pp = duty_fm/50,
+            avt_rate = avt_fm,
             avt  = avt_fm*price_fm,
             total_excise_per_pack = total_excise_per_pack,
             excise_pct_fm = excise_pct_fm,
             tot_spend_fm = tot_spend_fm,
             tot_duty_ryo = tot_duty_ryo,
             price_ryo = price_ryo,
+            deflator = deflator,
             price_ryo_d = price_ryo*deflator,
-            duty_ryo = duty_ryo/10,
+            duty_ryo    = duty_ryo,
+            duty_ryo_pp = duty_ryo/10,
             excise_pct_ryo = excise_pct_ryo,
             tot_spend_ryo = tot_spend_ryo,
             total_annual_spend_hmrc = total_annual_spend_hmrc,

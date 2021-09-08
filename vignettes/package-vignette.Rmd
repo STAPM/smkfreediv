@@ -3,7 +3,7 @@ title: "Calculating the Smoke-free Dividend"
 author: "Damon Morris"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{package-vignette}
+  %\VignetteIndexEntry{Calculating the Smoke-free Dividend}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -48,7 +48,7 @@ Data on the smoking population at local authority level is obtained from the [Pu
 standard errors, and population size by local authority district (151 districts). 
 
 ```{r tob_profiles, echo = FALSE}
-head(smkfreediv::tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Doncaster","Rotherham"),
+head(smkfreediv::PHE_tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Doncaster","Rotherham"),
                                   c("UTLAname","pop_n","smk_prev","smk_prev_se","n_smokers","n_smokers_se")])
 ```
 
@@ -61,7 +61,7 @@ The plot below gives an example of the uncertainty around the smoking prevalence
 The plot shows that the mean estimated smoking prevalences for Barnsley, Doncaster, and Rotherham are similar and in the range of 17.5% to 19% while for Sheffield the figure is much lower at 14%. The plot shows there is some probability of the true prevalences being closer, with the upper tail of the Sheffield distribution overlapping with the lower tails of the other distributions.
 
 ```{r s_yorks, echo = FALSE, fig.asp = 0.8, fig.width = 6}
-data <- smkfreediv::tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Doncaster","Rotherham"),
+data <- smkfreediv::PHE_tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Doncaster","Rotherham"),
                              c("UTLAname","pop_n","smk_prev","smk_prev_se","n_smokers","n_smokers_se")]
 
 ### generate normal distributions
@@ -111,39 +111,137 @@ ggplot(reshape) +
 
 ### Income 
 
-Income data is produced by the [Office for National Statistics (ONS)](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales). The data used is 2018 modelled average income at the medium super output area (MSOA) level, which can be matched to local authority districts. To get average income at the local authority level, a simple unweighted mean is taken across constitutent MSOAs. 
+Income data is produced by the [Office for National Statistics (ONS)](https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales). The data used is 2018 modelled average income at the medium super output area (MSOA) level, which can be matched to local authority districts. To get average income at the local authority level, a simple unweighted mean is taken across constituent MSOAs. In order to retain uncertainty information on the income figures, the MSOA level figure and confidence intervals are used to simulate the mean and standard deviation of the local authority district level income measures calculated.
 
-In order to retain uncertainty information on the income figures, the MSOA level figure and confidence intervals are used to simulate the mean and standard deviation of the local authority district level income measures calculated.
-
-We are able to produce three income measures:
+We are able to produce three income measures from this data source:
 
 1. Net annual income 
 1. Net annual income equivalised using OECD equivalence scales ([see here](https://www.oecd.org/economy/growth/OECD-Note-EquivalenceScales.pdf))
 1. Net annual income equivalised using OECD equivalence scales __after housing costs__
 
-## Workflow 
+## Methods
+
+### Cleaning the Toolkit Data
+
+This stage uses the `CleanToolkit` and `DeflateToolkit` functions. The first selects the time frame of the sample, selects and cleans variables. 
+
+The second function is applied to the cleaned data to adjust expenditures for inflation using the tobacco component of the Consumer Price Index (CPI) so all values are expressed in December 2018 prices.
 
 
-### Data Preparation
+### Calculating the Upshift
 
-```{r data_clean, eval = FALSE }
-## name of the data file for wave 174 of toolkit (April 2021)
-data <- "omni174_39.1_65.2cot_31.3a_25.4s_recodes_60.5sa.sav"
+The first step is to calculate the amount by which individual spending is upshifted. Spending is upshfifted because of discrepancy between the implied total spending by the toolkit data and the reported duty receipts by HMRC. 
 
-## file path to where the raw data is stored
-path <- "C:/Users/cm1djm/Documents/GitLab Projects/SPECTRUM/Projects/smoke free dividend/input_data/"
+The upshift factor is calculated by the `CalcUpshift` function, which is illustrated below. The amount by which expenditures need to be upshifted is determined by calculating the total expenditures on tobacco implied by (i) grossing up weekly expenditure to the population and annualising, and (ii) using data on total annual HMRC duty receipts and average prices. The upshift factor is then the ratio of the latter to the former. 
 
-## read in the raw SPSS data file
-toolkit_raw <- smkfreediv::ReadToolkit(path = path,
-                                       data = data,
-                                       save = TRUE)
+First we calculate the weekly tobacco expenditure of the mean smoker in the Toolkit sample by applying the `CalcWeekSpend` function, setting the upshift factor to equal 1 (i.e. no upshifting). The mean is calculated using the sample weights and is stratified by upper tier local authority. We then merge the local authority level mean expenditures to the Public Health England tobacco profiles, multiplying mean local authority expenditure per smoker by the number of smokers in the local authority. This figure is then annualised and summed over local authorities to produce an estimate of total population expenditure on tobacco in a single year. 
 
-## clean the data and use April 2014 to February 2019 data
-toolkit_clean <- smkfreediv::CleanToolkit(data = toolkit_raw,
-                                          start_month = 90,
-                                          end_month = 160)
+To calculate the expenditures from HMRC duty receipts, we obtain the duty receipts by financial year for 2018/2019 from the [ONS tobacco bulletin](https://www.gov.uk/government/statistics/tobacco-bulletin}) for cigarettes (£7,748m) and hand-rolled tobacco (£1,444m).The calculations for expenditure are based on prices for a packet of 20 cigarettes and per 100g of hand-rolled tobacco respectively. The price of hand-rolled tobacco is taken as an average of prices from various supermarkets and deflated to December 2018 prices, again using the tobacco CPI. 
+
+```{r upshift_calc, eval = FALSE}
+upshift <- smkfreediv::CalcUpshift(data = data)
+
+CalcUpshift <- function(data = data,
+                        LCFS = FALSE,
+                        price_fm = 8.83,
+                        duty_fm = 228.29,
+                        avt_fm = 0.165,
+                        tot_duty_fm = 7748,
+                        price_ryo = 51.60,
+                        duty_ryo = 234.65,
+                        tot_duty_ryo = 1444,
+                        deflate = c(12,2020)) {
+
+  #################################
+  # Total Spending Calc - Toolkit #
+
+# calculate mean weekly expenditure by local authority
+exp <- smkfreediv::CalcWeekSpend(data = data,
+                                 strat_vars = c("UTLAcode","UTLAname"),
+                                 upshift = 1)
+
+# merge in tobacco profiles
+merge <- merge(exp, smkfreediv::PHE_tobacco_profiles, by = c("UTLAcode","UTLAname"))
+
+# calculate total expenditure
+
+merge[,tot_weekly_exp := n_smokers*mean_week_spend]
+merge[,tot_annual_exp := n_smokers*mean_week_spend*52.25]
+
+merge <- merge[,c("UTLAname","UTLAcode","n_smokers",
+                  "mean_week_spend","tot_weekly_exp","tot_annual_exp")]
+
+total_annual_spend <- sum(merge$tot_annual_exp, na.rm = TRUE)
+
+##############################
+# Total Spending Calc - HMRC #
+
+## FM Cigs
+
+total_excise_per_pack <- avt_fm*price_fm + (duty_fm/50)
+
+excise_pct_fm <- total_excise_per_pack/price_fm
+
+tot_spend_fm <- round(tot_duty_fm/excise_pct_fm)
+
+## RYO tob
+
+# deflation factor for prices
+frm_yr <- as.numeric(smkfreediv::price_cigs[month == deflate[1] & year == deflate[2]],"price")
+frm_yr <- frm_yr[1]
+to_yr <- as.numeric(smkfreediv::price_cigs[month == 12 & year == 2018,"price"])
+
+deflator <- to_yr/frm_yr
+
+total_excise_per_100g <- (duty_ryo/10)
+
+excise_pct_ryo <- total_excise_per_100g/(price_ryo*deflator)
+
+tot_spend_ryo <- round(tot_duty_ryo/excise_pct_ryo)
+
+## sum up
+
+total_annual_spend_hmrc <- tot_spend_fm + tot_spend_ryo
+
+######################################
+## CALCULATE THE UPSHIFT MULTIPLIER ##
+
+if (LCFS == TRUE) {
+  upshift <- total_annual_spend_hmrc/5522
+  total_annual_spend_surv <- 5522
+
+} else {
+  upshift <- total_annual_spend_hmrc/(total_annual_spend/1000000)
+  total_annual_spend_surv <- (total_annual_spend/1000000)
+}
+
+return(list(upshift = upshift,
+            tot_duty_fm = tot_duty_fm,
+            price_fm = price_fm,
+            duty_fm = duty_fm/50,
+            avt  = avt_fm*price_fm,
+            total_excise_per_pack = total_excise_per_pack,
+            excise_pct_fm = excise_pct_fm,
+            tot_spend_fm = tot_spend_fm,
+            tot_duty_ryo = tot_duty_ryo,
+            price_ryo = price_ryo,
+            deflator = deflator,
+            price_ryo_d = price_ryo*deflator,
+            duty_ryo = duty_ryo/10,
+            excise_pct_ryo = excise_pct_ryo,
+            tot_spend_ryo = tot_spend_ryo,
+            total_annual_spend_hmrc = total_annual_spend_hmrc,
+            total_annual_spend_surv = total_annual_spend_surv
+            ))
+}
 
 ```
 
-### Simulation
+# TEST
 
+```{r}
+x = 5  # radius of a circle
+```
+
+For a circle with the radius `r x`,
+its area is `r pi * x^2`.

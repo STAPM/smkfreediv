@@ -139,7 +139,7 @@ return(list(upshift = upshift,
             tot_spend_ryo = tot_spend_ryo,
             total_annual_spend_hmrc = total_annual_spend_hmrc,
             total_annual_spend_surv = total_annual_spend_surv,
-            svy_data = source,
+            svy_data = source
             ))
 }
 

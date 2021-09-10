@@ -70,6 +70,15 @@
 #' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp}{ONS Cigarette prices}
 "price_cigs"
 
+#' Tobacco Duty Receipts
+#'
+#' Annual time series of the total duty receipts from factory-made cigarettes and hand-rolled tobacco.
+#' Data by calendar year from 1992 to 2020.
+#'
+#' @format
+#' @source \href{https://www.gov.uk/government/statistics/tobacco-bulletin}{ONS Tobacco Bulletin}
+"tobacco_duty_receipts"
+
 #' Upper Tier Local Authority to Region Lookup
 #'
 #' A lookup table to match local authority districts to government office region geographies.

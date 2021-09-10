@@ -17,10 +17,8 @@
 #' @param price_fm Numeric. Price of factory made cigarettes per pack of 20.
 #' @param duty_fm Numeric. Duty per 1,000 cigarettes
 #' @param avt_fm Numeric. Ad-valorem tax rate on factory made cigarettes.
-#' @param tot_duty_fm Numeric. Total duty receipts from factory made cigarettes
 #' @param price_ryo Numeric. Price of 100g of hand-rolling tobacco.
 #' @param duty_ryo Numeric. Duty per 1kg of hand-rolling tobacco.
-#' @param tot_duty_ryo Numeric. Total duty receipts from hand-rolling tobacco.
 #' @param deflate Numeric vector with 2 arguments containing the month and year corresponding to
 #' the price of hand-rolled tobacco. This is to construct a deflation factor to Dec 2018 prices.
 #'
@@ -47,11 +45,9 @@ CalcUpshift <- function(data = data,
                         price_fm = 8.83,
                         duty_fm = 228.29,
                         avt_fm = 0.165,
-                        tot_duty_fm = 7748,
                         price_ryo = 51.60,
                         duty_ryo = 234.65,
-                        tot_duty_ryo = 1444,
-                        deflate = c(12,2020)) {
+                        deflate = c(12,2018)) {
 
   #################################
   # Total Spending Calc - Toolkit #
@@ -76,6 +72,11 @@ total_annual_spend <- sum(merge$tot_annual_exp, na.rm = TRUE)
 
 ##############################
 # Total Spending Calc - HMRC #
+
+## grab total duty for both products from the same year deflating prices to
+
+tot_duty_fm  <- as.numeric(smkfreediv::tobacco_duty_receipts[year == deflate[2],"FM_cigs"])
+tot_duty_ryo <- as.numeric(smkfreediv::tobacco_duty_receipts[year == deflate[2],"RYO_tob"])
 
 ## FM Cigs
 

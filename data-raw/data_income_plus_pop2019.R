@@ -262,8 +262,53 @@ la_inc_pop <- copy(merge3)
 
 rm(merge1, merge2, merge3, pop, net_annual_inc, net_annual_inc_eq, net_annual_inc_eq_disp)
 
+###############################################################
+### Adjust some LA codes and merge in UTLA names and codes ####
+
+## match LA codes for Welwyn Hatfield and St Albans to those in the LA/UTLA lookup.
+
+la_inc_pop[LAname == "St Albans", LAcode := "E07000240"]
+la_inc_pop[LAname == "Welwyn Hatfield", LAcode := "E07000241"]
+
 #### save out final data
 
 la_inc_pop <- la_inc_pop[order(LAname),]
 
-usethis::use_data(la_inc_pop, overwrite = TRUE)
+#usethis::use_data(la_inc_pop, overwrite = TRUE)
+
+
+###########################################
+## Merge in upper tier local authorities ##
+
+localauthorities <- read.csv("data-raw/LTLA to UTLA England and Wales 2012 2019.csv")
+setDT(localauthorities)
+
+setnames(localauthorities,
+         names(localauthorities),
+         c("LAcode","LAname","UTLAcode","UTLAname"))
+
+localauthorities <- localauthorities[substring(LAcode,1,1) == "E",]
+
+income <- merge(localauthorities, la_inc_pop, by = c("LAcode","LAname"))
+
+income <- income[order(UTLAname),]
+
+### tidy up so the names and codes match exactly to the tobacco profiles
+
+income[UTLAname == "Buckinghamshire", UTLAcode := "E06000060"]
+income[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
+
+# fix mis-match of Bristol naming
+income[UTLAcode == "E06000023", UTLAname := "Bristol"]
+
+# fix mis-match of Kingston upon Hull naming
+income[UTLAcode == "E06000010", UTLAname := "Kingston upon Hull"]
+
+# fix mis-match of Herefordshire naming
+income[UTLAcode == "E06000019", UTLAname := "Herefordshire"]
+
+# Dorset codes
+income[UTLAcode == "E10000009", UTLAcode := "E06000059"]
+
+
+usethis::use_data(income, overwrite = TRUE)

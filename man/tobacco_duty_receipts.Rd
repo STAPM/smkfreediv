@@ -15,5 +15,6 @@ tobacco_duty_receipts
 }
 \description{
 Annual time series of the total duty receipts from factory-made cigarettes and hand-rolled tobacco.
+Data by calendar year from 1992 to 2020.
 }
 \keyword{datasets}

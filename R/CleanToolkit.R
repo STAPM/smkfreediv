@@ -40,11 +40,28 @@ CleanToolkit <- function(data = data,
                    ExSmoker = exsmoker,
 
                    ### expenditures
-                   weekspend
+                   weekspend,
 
                    ### consumption/dependence
                    # q632x1, q632a9_1, q632a0_1, q632b1_1
+                   ryoperc,
+                   cigs_type = typcig,
+                   cigs_perday_ryo = basehand,
+                   cigs_perday_fm = mancig
   )]
+
+  ###########################
+  ### CONSUMPTION VARIABLES
+
+
+  data[, cigs_type_fm   := ifelse(cigs_type == "Manufactured only", 1, 0)]
+  data[, cigs_type_ryo  := ifelse(cigs_type == "RYO only", 1, 0)]
+  data[, cigs_type_both := ifelse(cigs_type == "Manufactured and RYO", 1, 0)]
+
+  data[is.na(cigs_type), cigs_type_fm := NA]
+  data[is.na(cigs_type), cigs_type_ryo := NA]
+  data[is.na(cigs_type), cigs_type_both := NA]
+
 
   #######################
   #### TIME VARIABLES

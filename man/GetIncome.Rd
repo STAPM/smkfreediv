@@ -4,16 +4,10 @@
 \alias{GetIncome}
 \title{Construct UTLA Average Income}
 \usage{
-GetIncome(
-  mapping_data = smkfreediv::localauthorities,
-  income_data = smkfreediv::la_inc_pop,
-  income_var = 3
-)
+GetIncome(income_data = smkfreediv::income, income_var = 3)
 }
 \arguments{
-\item{mapping_data}{Data table. Mapping from lower-tier to upper-tier local authorities}
-
-\item{income_data}{Data table}
+\item{income_data}{Data table. Local authority level income data.}
 
 \item{income_var}{Integer. Option governing which income variable is used. 1 for net household income,
 2 for net household income equivalised, and 3 for net household income equivalised after housing costs.}

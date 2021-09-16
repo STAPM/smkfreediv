@@ -10,11 +10,9 @@ CalcUpshift(
   price_fm = 8.83,
   duty_fm = 228.29,
   avt_fm = 0.165,
-  tot_duty_fm = 7748,
   price_ryo = 51.6,
   duty_ryo = 234.65,
-  tot_duty_ryo = 1444,
-  deflate = c(12, 2020)
+  deflate = c(12, 2018)
 )
 }
 \arguments{
@@ -28,13 +26,9 @@ CalcUpshift(
 
 \item{avt_fm}{Numeric. Ad-valorem tax rate on factory made cigarettes.}
 
-\item{tot_duty_fm}{Numeric. Total duty receipts from factory made cigarettes}
-
 \item{price_ryo}{Numeric. Price of 100g of hand-rolling tobacco.}
 
 \item{duty_ryo}{Numeric. Duty per 1kg of hand-rolling tobacco.}
-
-\item{tot_duty_ryo}{Numeric. Total duty receipts from hand-rolling tobacco.}
 
 \item{deflate}{Numeric vector with 2 arguments containing the month and year corresponding to
 the price of hand-rolled tobacco. This is to construct a deflation factor to Dec 2018 prices.}

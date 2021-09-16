@@ -37,8 +37,7 @@ CalcDividend_la_sim <- function(data,
 
   ## Grab income data
 
-  income <- smkfreediv::GetIncome(mapping_data = smkfreediv::localauthorities,
-                                  income_data = smkfreediv::la_inc_pop,
+  income <- smkfreediv::GetIncome(income_data = smkfreediv::income,
                                   income_var = 3)
 
   ######## DETERMINISTIC CALCULATION
@@ -72,9 +71,8 @@ CalcDividend_la_sim <- function(data,
 
     ## Grab the income data, including a probabilistically drawn mean income
 
-    income_prob <- smkfreediv::GetIncome(mapping_data = smkfreediv::localauthorities,
-                                    income_data = smkfreediv::la_inc_pop,
-                                    income_var = 3)
+    income_prob <- smkfreediv::GetIncome(income_data = smkfreediv::income,
+                                         income_var = 3)
 
     ## Use the income/spending to calculate the smoke free dividend for
     ## each local authority.

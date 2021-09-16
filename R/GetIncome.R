@@ -3,8 +3,7 @@
 #' Select one of the stored income variables to construct at upper-tier local authority level from the
 #' variables stored in the package data \code{la_inc_pop} at lower-tier local authority level.
 #'
-#' @param mapping_data Data table. Mapping from lower-tier to upper-tier local authorities
-#' @param income_data Data table
+#' @param income_data Data table. Local authority level income data.
 #' @param income_var Integer. Option governing which income variable is used. 1 for net household income,
 #' 2 for net household income equivalised, and 3 for net household income equivalised after housing costs.
 #'
@@ -16,8 +15,7 @@
 #' \dontrun{
 #'
 #' }
-GetIncome <- function(mapping_data = smkfreediv::localauthorities,
-                      income_data = smkfreediv::la_inc_pop,
+GetIncome <- function(income_data = smkfreediv::income,
                       income_var = 3) {
 
   ### grab the income variable desired for the analysis
@@ -38,33 +36,41 @@ GetIncome <- function(mapping_data = smkfreediv::localauthorities,
                               income_data[,"net_annual_inc_eq_disp_SD"])
   }
 
-  income <- income_data[,c("LAcode","LAname","pop_2019")]
+  income <- income_data[,c("LAcode","LAname","UTLAcode","UTLAname","pop_2019")]
 
   income_final <- cbind(income, income_vars)
 
+  # one missing population value for Shepway, screws up the weighted mean for Kent. Just
+  # set as the mean population for Kent LAs (not ideal, better than 0 as downweights a relatively
+  # low income part of Kent)
+
+  impute <- mean(income_final[UTLAname == "Kent", pop_2019], na.rm = T)
+
+  income_final[LAname == "Shepway",pop_2019 := impute]
+
   setnames(income_final,
            names(income_final),
-           c("LAcode","LAname","pop_2019",
+           c("LAcode","LAname","UTLAcode","UTLAname","pop_2019",
              "income","income_sim_mean","income_sim_sd"))
 
   ### merge income and population data to the local authority mapping
 
-  merge <- merge(income_final , mapping_data, by = c("LAcode","LAname"))
+  #merge <- merge(income_final , mapping_data, by = c("LAcode","LAname"))
 
-  rm(income_vars, income_final, income)
+  #rm(income_vars, income_final, income)
   ### generate mean income at UTLA level using population in 2019 as weights
   ### (deterministic calculation)
 
-  data <- merge[, .(income = weighted.mean(income, w = pop_2019, na.rm = TRUE),
+  data <- income_final[, .(income = weighted.mean(income, w = pop_2019, na.rm = TRUE),
                     population = sum(pop_2019, na.rm = TRUE)),
                 by = c("UTLAcode","UTLAname")]
 
   ### generate mean income at UTLA level using population in 2019 as weights
   ### (probabilistic calculation)
 
-  data_pop <- merge[, income_sim := rnorm(1,income,income_sim_sd), by = c("LAcode","LAname")]
+  data_pop <- income_final[, income_sim := rnorm(1,income,income_sim_sd), by = c("LAcode","LAname")]
 
-  data_pop <- merge[, .(income_sim = weighted.mean(income_sim, w = pop_2019, na.rm = TRUE),
+  data_pop <- income_final[, .(income_sim = weighted.mean(income_sim, w = pop_2019, na.rm = TRUE),
                     population = sum(pop_2019, na.rm = TRUE)),
                 by = c("UTLAcode","UTLAname")]
 
@@ -73,23 +79,6 @@ GetIncome <- function(mapping_data = smkfreediv::localauthorities,
   data_out <- merge(data, data_pop, by = c("UTLAcode","UTLAname","population"))
 
   data_out <- data_out[order(UTLAname)]
-
-  ### tidy up so the names and codes match exactly to the tobacco profiles
-
-  data_out[UTLAname == "Buckinghamshire", UTLAcode := "E06000060"]
-  data_out[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
-
-  # fix mis-match of Bristol naming
-  data_out[UTLAcode == "E06000023", UTLAname := "Bristol"]
-
-  # fix mis-match of Kingston upon Hull naming
-  data_out[UTLAcode == "E06000010", UTLAname := "Kingston upon Hull"]
-
-  # fix mis-match of Herefordshire naming
-  data_out[UTLAcode == "E06000019", UTLAname := "Herefordshire"]
-
-  # Dorset codes
-  data_out[UTLAcode == "E10000009", UTLAcode := "E06000059"]
 
   return(data_out)
 }

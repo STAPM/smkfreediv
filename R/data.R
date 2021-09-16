@@ -7,13 +7,6 @@
 #' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7cb/mm23}{Tobacco CPI time series}
 "cpi_tobacco"
 
-#' Local Authority to Region Lookup
-#'
-#' A lookup table to match local authority districts to government office region geographies.
-#'
-#'
-"la_gor_lookup"
-
 #' Local Authority Data.
 #'
 #' A dataset containing lower tier local authorities income and population counts. Raw data gives
@@ -22,7 +15,14 @@
 #'
 #' @format
 #' @source \href{https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales}{Income Data}
-"la_inc_pop"
+"income"
+
+#' Local Authority to Region Lookup
+#'
+#' A lookup table to match local authority districts to government office region geographies.
+#'
+#'
+"la_gor_lookup"
 
 #' Local Authority Names and Codes.
 #'

@@ -9,7 +9,8 @@ CalcDividend_la_sim(
   upshift = 1.57151042,
   div = 0.93,
   n_sim = 100,
-  seed = 2021
+  seed = 2021,
+  illicit_prop = 1298/(14307 + 1298)
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ CalcDividend_la_sim(
 \item{n_sim}{Numeric. Number of simulations.}
 
 \item{seed}{Numeric. Random number seed.}
+
+\item{illicit_prop}{Numeric. The proportion of total tobacco expenditure which is illicit.}
 }
 \value{
 

@@ -9,7 +9,8 @@ CalcDividend_la(
   clean_income,
   clean_expenditure,
   div = 0.93,
-  prob = FALSE
+  prob = FALSE,
+  illicit_prop = 1298/(14307 + 1298)
 )
 }
 \arguments{
@@ -21,7 +22,9 @@ CalcDividend_la(
 
 \item{div}{Numeric. Proportion of expenditure paid in tax.}
 
-\item{prob}{Character. If TRUE draws inputs to the dividend calculation probabilistically}
+\item{prob}{Character. If TRUE draws inputs to the dividend calculation probabilistically.}
+
+\item{illicit_prop}{Numeric. The proportion of total tobacco expenditure which is illicit.}
 }
 \value{
 

@@ -9,6 +9,7 @@
 #' @param div Numeric. Proportion of expenditure paid in tax.
 #' @param n_sim Numeric. Number of simulations.
 #' @param seed Numeric. Random number seed.
+#' @param illicit_prop Numeric. The proportion of total tobacco expenditure which is illicit.
 #'
 #' @return
 #' @export
@@ -22,7 +23,8 @@ CalcDividend_la_sim <- function(data,
                                 upshift = 1.57151042,
                                 div = 0.93,
                                 n_sim = 100,
-                                seed = 2021) {
+                                seed = 2021,
+                                illicit_prop = 1298 / (14307 + 1298)) {
 
   set.seed(seed)
 
@@ -46,7 +48,8 @@ CalcDividend_la_sim <- function(data,
                                 clean_income = income,
                                 clean_expenditure = exp,
                                 div = div,
-                                prob = FALSE)
+                                prob = FALSE,
+                                illicit_prop = illicit_prop)
 
   ######## PROBABILISTIC CALCULATION
 

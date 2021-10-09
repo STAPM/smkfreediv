@@ -6,7 +6,8 @@
 #' @param clean_income Data table. Cleaned income data.
 #' @param clean_expenditure Data table. Cleaned local authority level weekly expenditure.
 #' @param div Numeric. Proportion of expenditure paid in tax.
-#' @param prob Character. If TRUE draws inputs to the dividend calculation probabilistically
+#' @param prob Character. If TRUE draws inputs to the dividend calculation probabilistically.
+#' @param illicit_prop Numeric. The proportion of total tobacco expenditure which is illicit.
 #'
 #' @return
 #' @export
@@ -20,7 +21,8 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
                             clean_income ,
                             clean_expenditure ,
                             div = 0.93,
-                            prob = FALSE) {
+                            prob = FALSE,
+                            illicit_prop = 1298 / (14307 + 1298)) {
 
   ## grab the tobacco profiles and merge to mean expenditure
 
@@ -45,7 +47,7 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
   det[, spend_prop := (mean_week_spend * 52)/income]
 
-  det[, dividend := total_annual_exp * div]
+  det[, dividend := (total_annual_exp * illicit_prop) + (total_annual_exp * (1-illicit_prop))*div]
 
   det[, c("smk_prev_se","income_sim", "n_smokers_se",
           "se_week_spend", "population", "sample_tkit") := NULL]
@@ -89,7 +91,7 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
   prob[, prob_spend_prop := (prob_mean_week_spend * 52)/prob_income]
 
-  prob[, prob_dividend := prob_total_annual_exp * div]
+  prob[, prob_dividend := (prob_total_annual_exp * illicit_prop) + (prob_total_annual_exp * (1-illicit_prop))*div]
 
   prob[, c("smk_prev", "smk_prev_se", "n_smokers", "n_smokers_se",
            "se_week_spend", "mean_week_spend","sample_tkit",

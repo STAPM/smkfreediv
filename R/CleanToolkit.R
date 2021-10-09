@@ -41,6 +41,8 @@ CleanToolkit <- function(data = data,
 
                    ### expenditures
                    weekspend,
+                   buysmug,
+                   buysmuc,
 
                    ### consumption/dependence
                    # q632x1, q632a9_1, q632a0_1, q632b1_1

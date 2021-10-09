@@ -148,7 +148,7 @@ ggplot(data = data) +
 
 ## Methods
 
-### Cleaning the Toolkit Data
+### (i) Cleaning the Toolkit Data
 
 This stage uses the `CleanToolkit` and `DeflateToolkit` functions. The first selects the time frame of the sample, selects and cleans variables. 
 
@@ -174,11 +174,13 @@ ggplot(data = data) +
 ```
 
 
-### Calculating the Upshift
+### (ii) Calculating the Upshift
 
 The first step is to calculate the amount by which individual spending is upshifted. Spending is upshfifted because of discrepancy between the implied total spending by the toolkit data and the reported duty receipts by HMRC. 
 
-The upshift factor is calculated by the `CalcUpshift` function, which is illustrated below. The amount by which expenditures need to be upshifted is determined by calculating the total expenditures on tobacco implied by (i) grossing up weekly expenditure to the population and annualising, and (ii) using data on total annual HMRC duty receipts and average prices. The upshift factor is then the ratio of the latter to the former. 
+The upshift factor is calculated by the `CalcUpshift` function, which is illustrated below. The amount by which expenditures need to be upshifted is determined by calculating the total expenditures on tobacco implied by (i) grossing up weekly expenditure to the population and annualising, and (ii) using data on total annual HMRC duty receipts and average prices. The upshift factor is then the ratio of the latter to the former.
+
+#### Total Expenditure - Survey Data
 
 First we calculate the weekly tobacco expenditure of the mean smoker in the Toolkit sample by applying the `CalcWeekSpend` function, setting the upshift factor to equal 1 (i.e. no upshifting). The mean is calculated using the sample weights and is stratified by upper tier local authority. We then merge the local authority level mean expenditures to the Public Health England tobacco profiles, multiplying mean local authority expenditure per smoker by the number of smokers in the local authority. This figure is then annualised and summed over local authorities to produce an estimate of total population expenditure on tobacco in a single year. 
 
@@ -187,108 +189,34 @@ tot_duty_fm  <- round(as.numeric(smkfreediv::tobacco_duty_receipts[year == 2018,
 tot_duty_ryo <- round(as.numeric(smkfreediv::tobacco_duty_receipts[year == 2018,"RYO_tob"]))
 ```
 
-To calculate the expenditures from HMRC duty receipts, we obtain the duty receipts for calendar 2018 from the `smkfreediv::tobacco_duty_receipts` data described above, separately for cigarettes (£`r tot_duty_fm`m) and hand-rolled tobacco (£`r tot_duty_ryo`m). We then estimate the proportion of total price for each product which is composed of duties and combine this with the figures for total duty receipts to calculate implied total expenditure. 
+#### Total Expenditure - HMRC Receipts
+
+To calculate the expenditures from HMRC duty receipts, we obtain the duty receipts for calendar 2018 from the `smkfreediv::tobacco_duty_receipts` data described above, separately for cigarettes (£`r tot_duty_fm`m) and hand-rolled tobacco (£`r tot_duty_ryo`m). As these figures are UK totals, we adjust them to England-only totals by multiplying these totals by 82% - the proportion of smokers in the UK who live in England, calculated from the Annual Population Survey 2011-2018.
+
+We then estimate the proportion of total price for each product which is composed of duties and combine this with the figures for total duty receipts to calculate implied total expenditure. The calculations for expenditure are based on prices for a packet of 20 cigarettes and per 100g of hand-rolled tobacco respectively. The price of hand-rolled tobacco is taken as an average of prices from various supermarkets and deflated to December 2018 prices, again using the tobacco CPI. 
+
+Taking the price of a packet of 20 factory-made cigarettes to be £8.83, the ad-valorem tax paid per pack is £1.46 (16.5% of £8.83). With a specific duty of £228.29 per 1000 cigarettes, the duty per pack of 20 is £228.29/50 = £4.57. This means a total duty of £6.02 per pack, which is 68.21% of the price. Dividing the duty figure by this proportion gives an estimate of total expenditure on factory-made cigarettes of £9,343m. A similar calculation for RYO tobacco yields a figure of £2,425m and total tobacco expenditure of £11,768m. 
+
+#### Upshift 
+
+The upshift is the ratio of the two figures. The estimate from duty receipts is £11,768m of tobacco expenditure compared to £7,507m from the toolkit data. This yields an upshift of 11,768/7507 = 1.568. In calculating total expenditure by local authority in the toolkit data, all individual level expenditures are first multiplied by this upshift to correct for under-reporting of expenditures in survey data. 
+
+Note in this example, the duty receipts estimate of total expenditure is based entirely on the HMRC duty receipts. Total expenditure must also account for spending on illicit tobacco. This is done by using the estimate of illicit spending in Howard Reeds work to construct the proportion of total expenditure which is illicit and use this to impute illicit spending from the legal spending and add this in to the total expenditure figure of £11,768m calculated above.
 
 
-The calculations for expenditure are based on prices for a packet of 20 cigarettes and per 100g of hand-rolled tobacco respectively. The price of hand-rolled tobacco is taken as an average of prices from various supermarkets and deflated to December 2018 prices, again using the tobacco CPI. 
 
-```{r upshift_calc, eval = FALSE}
-upshift <- smkfreediv::CalcUpshift(data = data)
 
-CalcUpshift <- function(data = data,
-                        LCFS = FALSE,
-                        price_fm = 8.83,
-                        duty_fm = 228.29,
-                        avt_fm = 0.165,
-                        price_ryo = 51.60,
-                        duty_ryo = 234.65,
-                        deflate = c(12,2020)) {
+### (iii) Calculating the Local Authority Smoke-free Dividends
 
-  #################################
-  # Total Spending Calc - Toolkit #
+The smokefree dividend for each local authority is calculated first by obtaining the mean weekly expenditure ($\bar{e}_i$) on tobacco by smokers by local authority, with each individual expenditure multiplied by the upshift factor calculated in part (ii). Annual expenditure in local authority $i$, $E_i$, is then calculated by multiplying this upshifted weekly average by 52 and the number of smokers:
 
-# calculate mean weekly expenditure by local authority
-exp <- smkfreediv::CalcWeekSpend(data = data,
-                                 strat_vars = c("UTLAcode","UTLAname"),
-                                 upshift = 1)
+\begin{equation}
+E_i = N^{smoke}_i * \bar{e}_i * 52
+\end{equation}
 
-# merge in tobacco profiles
-merge <- merge(exp, smkfreediv::PHE_tobacco_profiles, by = c("UTLAcode","UTLAname"))
+We calculate the smokefree dividend as 93% of total local authority expenditure. A further distinction in the analysis is made between licit and illicit tobacco expenditure. We consider 100% of savings on illicit tobacco expenditure to be part of the dividend. We therefore have to identify illict expenditure from the total. To do this we use an estimate of total expenditure on illicit sources of tobacco in 2018/19 of £1,219m combined with total legal tobacco spend of £14,307. This implies, in total, a proportion of total expenditures on tobacco which are on illicit sources of approximately 8.32%. Denoting this proportion as $\rho$, we calculate the dividend, $D$, as:
 
-# calculate total expenditure
-
-merge[,tot_weekly_exp := n_smokers*mean_week_spend]
-merge[,tot_annual_exp := n_smokers*mean_week_spend*52.25]
-
-merge <- merge[,c("UTLAname","UTLAcode","n_smokers",
-                  "mean_week_spend","tot_weekly_exp","tot_annual_exp")]
-
-total_annual_spend <- sum(merge$tot_annual_exp, na.rm = TRUE)
-
-##############################
-# Total Spending Calc - HMRC #
-
-## FM Cigs
-
-total_excise_per_pack <- avt_fm*price_fm + (duty_fm/50)
-
-excise_pct_fm <- total_excise_per_pack/price_fm
-
-tot_spend_fm <- round(tot_duty_fm/excise_pct_fm)
-
-## RYO tob
-
-# deflation factor for prices
-frm_yr <- as.numeric(smkfreediv::price_cigs[month == deflate[1] & year == deflate[2]],"price")
-frm_yr <- frm_yr[1]
-to_yr <- as.numeric(smkfreediv::price_cigs[month == 12 & year == 2018,"price"])
-
-deflator <- to_yr/frm_yr
-
-total_excise_per_100g <- (duty_ryo/10)
-
-excise_pct_ryo <- total_excise_per_100g/(price_ryo*deflator)
-
-tot_spend_ryo <- round(tot_duty_ryo/excise_pct_ryo)
-
-## sum up
-
-total_annual_spend_hmrc <- tot_spend_fm + tot_spend_ryo
-
-######################################
-## CALCULATE THE UPSHIFT MULTIPLIER ##
-
-if (LCFS == TRUE) {
-  upshift <- total_annual_spend_hmrc/5522
-  total_annual_spend_surv <- 5522
-
-} else {
-  upshift <- total_annual_spend_hmrc/(total_annual_spend/1000000)
-  total_annual_spend_surv <- (total_annual_spend/1000000)
-}
-
-return(list(upshift = upshift,
-            tot_duty_fm = tot_duty_fm,
-            price_fm = price_fm,
-            duty_fm = duty_fm/50,
-            avt  = avt_fm*price_fm,
-            total_excise_per_pack = total_excise_per_pack,
-            excise_pct_fm = excise_pct_fm,
-            tot_spend_fm = tot_spend_fm,
-            tot_duty_ryo = tot_duty_ryo,
-            price_ryo = price_ryo,
-            deflator = deflator,
-            price_ryo_d = price_ryo*deflator,
-            duty_ryo = duty_ryo/10,
-            excise_pct_ryo = excise_pct_ryo,
-            tot_spend_ryo = tot_spend_ryo,
-            total_annual_spend_hmrc = total_annual_spend_hmrc,
-            total_annual_spend_surv = total_annual_spend_surv
-            ))
-}
-
-```
-
-# Calculating the Local Authority Smoke-free Dividends
-
+\begin{equation}
+D_i = (\rho * E_i) + ((1-\rho) * E_i)*0.93
+\end{equation}
 

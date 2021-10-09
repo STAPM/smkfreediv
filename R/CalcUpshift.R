@@ -25,7 +25,8 @@
 #' prices should be deflated.
 #' @param receipts_data Data table. Tobacco duty receipts data.
 #' @param prices_data Data table. Price data for a 20-pack of cigarettes.
-#' @param adjust Logical. If TRUE adjust total receipts by the proportion of smokers who are English.
+#' @param adjust Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
+#' use total UK tobacco duty receipt figure.
 #'
 #' @return
 #' @export
@@ -56,7 +57,7 @@ CalcUpshift <- function(data = data,
                         deflate_to = c(12,2018),
                         receipts_data = smkfreediv::tobacco_duty_receipts,
                         prices_data = smkfreediv::price_cigs,
-                        adjust = FALSE) {
+                        adjust = TRUE) {
 
   #################################
   # Total Spending Calc - Toolkit #

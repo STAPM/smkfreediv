@@ -27,6 +27,7 @@
 #' @param prices_data Data table. Price data for a 20-pack of cigarettes.
 #' @param adjust Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
 #' use total UK tobacco duty receipt figure.
+#' @param illicit_prop Numeric. The proportion of total tobacco expenditure which is illicit.
 #'
 #' @return
 #' @export
@@ -57,7 +58,8 @@ CalcUpshift <- function(data = data,
                         deflate_to = c(12,2018),
                         receipts_data = smkfreediv::tobacco_duty_receipts,
                         prices_data = smkfreediv::price_cigs,
-                        adjust = TRUE) {
+                        adjust = TRUE,
+                        illicit_prop = 1298 / (14307 + 1298)) {
 
   #################################
   # Total Spending Calc - Toolkit #
@@ -121,7 +123,17 @@ CalcUpshift <- function(data = data,
 
   ## sum up RYO and FM figures
 
-  total_annual_spend_hmrc <- tot_spend_fm + tot_spend_ryo
+  legal <- tot_spend_fm + tot_spend_ryo
+
+  ## create the amount of illicit spending
+
+  if (adjust == TRUE) {
+  illicit = (legal/(1 - illicit_prop)) - legal
+  } else if (adjust == FALSE) {
+  illicit = 0
+  }
+
+  total_annual_spend_hmrc = legal + illicit
 
   ######################################
   ## CALCULATE THE UPSHIFT MULTIPLIER ##

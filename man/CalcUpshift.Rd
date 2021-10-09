@@ -12,7 +12,11 @@ CalcUpshift(
   avt_fm = 0.165,
   price_ryo = 51.6,
   duty_ryo = 234.65,
-  deflate = c(12, 2018)
+  deflate_from = c(12, 2020),
+  deflate_to = c(12, 2018),
+  receipts_data = smkfreediv::tobacco_duty_receipts,
+  prices_data = smkfreediv::price_cigs,
+  adjust = FALSE
 )
 }
 \arguments{
@@ -30,8 +34,17 @@ CalcUpshift(
 
 \item{duty_ryo}{Numeric. Duty per 1kg of hand-rolling tobacco.}
 
-\item{deflate}{Numeric vector with 2 arguments containing the month and year corresponding to
-the price of hand-rolled tobacco. This is to construct a deflation factor to Dec 2018 prices.}
+\item{deflate_from}{Numeric vector with 2 arguments containing the month and year corresponding to
+the price of hand-rolled tobacco.}
+
+\item{deflate_to}{Numeric vector with 2 arguments containing the month and year to which hand-rolled tobacco
+prices should be deflated.}
+
+\item{receipts_data}{Data table. Tobacco duty receipts data.}
+
+\item{prices_data}{Data table. Price data for a 20-pack of cigarettes.}
+
+\item{adjust}{Logical. If TRUE adjust total receipts by the proportion of smokers who are English.}
 }
 \value{
 

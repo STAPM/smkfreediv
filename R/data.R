@@ -70,6 +70,21 @@
 #' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp}{ONS Cigarette prices}
 "price_cigs"
 
+#' Proportion of English Smokers
+#'
+#' A scalar proportion of total UK smokers that are English. This is used to adjust UK total duty receipts from tobacco
+#' to a figure representative for England, in order to feed into the calculation of estimated total expenditure on tobacco
+#' in England for the upshift factor to apply to the toolkit data. This approach assumes that spending follows similar patterns
+#' across the four UK nations such that expenditures are distributed the same way as are smokers.
+#'
+#' The proportion is calculated using data on smoking status collected in the Annual Population Survey (APS) from 2011 to 2018.
+#' The proportion of UK smokers who are English is calculated separately for each year and averaged across the eight years. The
+#' figure is stable at around 82% and statistically not significantly different year on year.
+#'
+#' @format
+"prop_smokers_ENG"
+
+
 #' Tobacco Duty Receipts
 #'
 #' Annual time series of the total duty receipts from factory-made cigarettes and hand-rolled tobacco.

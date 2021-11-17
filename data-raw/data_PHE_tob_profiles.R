@@ -1,11 +1,11 @@
 library(data.table)
 
-profiles <- read.csv("data-raw/PHE tobacco profiles 2019.csv")
+profiles <- read.csv("data-raw/PHE tobacco profiles 2019 with region UTLA.csv")
 setDT(profiles)
 
 profiles <- profiles[Area.Code != "E92000001",]
 
-profiles <- profiles[,c("AreaName","Area.Code","Value",
+profiles <- profiles[,c("Parent.Name","AreaName","Area.Code","Value",
                         "Upper.CI.95.0.limit","Lower.CI.95.0.limit",
                         "Count")]
 
@@ -13,7 +13,7 @@ profiles[, Count := as.numeric(gsub(",","",Count))]
 
 setnames(profiles,
          names(profiles),
-         c("UTLAname","UTLAcode","smk_prev","smk_prev_uci","smk_prev_lci","n_smokers"))
+         c("gor","UTLAname","UTLAcode","smk_prev","smk_prev_uci","smk_prev_lci","n_smokers"))
 
 ## get confidence interval on the number of smokers by backing out the population from
 ## the prevalence estimate and number of smokers, then applying the prevalence confidence
@@ -26,13 +26,13 @@ profiles[, smk_prev_se := round((smk_prev_uci - smk_prev)/1.96,4)]
 
 ## simulate smoking prevalence to calculate standard error of the number of smokers
 
-reps <- 50000
+reps <- 1000
 
 m_n_smokers     = matrix(rep(NA, 151*reps), ncol = reps)
 
 for (i in 1:reps) {
 
-  cat("\t\t1. Simulating Number of Smokers", round(100*i/reps,2),"%", "               \r")
+  cat("\t\t1. Simulating Number of Smokers from the CIs", round(100*i/reps,2),"%", "               \r")
   utils::flush.console()
   if(i == reps) { cat("\n") }
 
@@ -59,5 +59,8 @@ profiles <- profiles[,c("UTLAcode","UTLAname","pop_n",
                         "n_smokers","n_smokers_se")]
 
 PHE_tobacco_profiles <- copy(profiles)
+
+PHE_tobacco_profiles <- PHE_tobacco_profiles[order(UTLAname),]
+
 
 usethis::use_data(PHE_tobacco_profiles, overwrite = TRUE)

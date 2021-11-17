@@ -24,7 +24,7 @@ usethis::use_data(la_gor_lookup, overwrite = TRUE)
 lookup <- read.csv("data-raw/utla_to_gor.csv")
 setDT(lookup)
 
-setnames(lookup, names(lookup), c("UTLAname","region"))
+setnames(lookup, names(lookup), c("UTLAname","gor"))
 
 lookup <- lookup[order(UTLAname),]
 lookup[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]

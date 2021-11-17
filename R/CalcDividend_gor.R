@@ -101,10 +101,10 @@ CalcDividend_gor <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
     prob[, prob_dividend := (prob_total_annual_exp * illicit_prop) + (prob_total_annual_exp * (1-illicit_prop))*div]
 
-    prob[, c("smk_prev", "smk_prev_se", "n_smokers", "n_smokers_se",
+    prob[, c("smk_prev", "smk_prev_se", "n_smokers",
              "se_week_spend", "mean_week_spend","sample_tkit",
              "pop_n", "population", "income_sim", "income") := NULL]
-
+    #"n_smokers_se",
     data_out <- copy(prob)
   }
 

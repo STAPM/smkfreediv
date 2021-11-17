@@ -66,8 +66,8 @@ CalcUpshift <- function(data = data,
 
   # calculate mean weekly expenditure by local authority
   exp <- smkfreediv::CalcWeekSpend(data = data,
-                                 strat_vars = c("UTLAcode","UTLAname"),
-                                 upshift = 1)
+                                   strat_vars = c("UTLAcode","UTLAname"),
+                                   upshift = 1)
 
   # merge in tobacco profiles
   merge <- merge(exp, smkfreediv::PHE_tobacco_profiles, by = c("UTLAcode","UTLAname"))

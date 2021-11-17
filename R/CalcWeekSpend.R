@@ -44,12 +44,13 @@ CalcWeekSpend <- function(data,
 
   mean_calcs[, sample := ifelse(is.na(weekspend), 0, 1)]
 
-  data_out <- mean_calcs[, .(mean_week_spend = weighted.mean(weekspend, w = Aweight0 ,na.rm = T),
-                             se_week_spend = sqrt(spatstat.geom::weighted.var(weekspend, w = Aweight0,na.rm = T)) / sqrt(.N),
-                             median_week_spend = spatstat.geom::weighted.median(weekspend, w = Aweight0, na.rm = T),
+
+  data_out <- mean_calcs[, .(mean_week_spend = Hmisc::wtd.mean(weekspend, w = Aweight0 ,na.rm = T),
+                             se_week_spend = sqrt(Hmisc::wtd.var(weekspend, w = Aweight0 ,na.rm = T)) / sqrt(.N),
+                             median_week_spend = median(weekspend, na.rm = T),
                              sample_tkit = sum(sample)
-                ),
-            by = strat_vars]
+  ),
+  by = strat_vars]
 
   return(data_out)
 }

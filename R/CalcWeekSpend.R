@@ -45,13 +45,16 @@ CalcWeekSpend <- function(data,
   mean_calcs[, sample := ifelse(is.na(weekspend), 0, 1)]
 
 
+  suppressWarnings({
   data_out <- mean_calcs[, .(mean_week_spend = Hmisc::wtd.mean(weekspend, w = Aweight0 ,na.rm = T),
                              se_week_spend = sqrt(Hmisc::wtd.var(weekspend, w = Aweight0 ,na.rm = T)) / sqrt(.N),
                              median_week_spend = median(weekspend, na.rm = T),
                              se_median_week_spend = 1.253*sqrt(Hmisc::wtd.var(weekspend, w = Aweight0 ,na.rm = T)) / sqrt(.N),
-                             sample_tkit = sum(sample)
-  ),
-  by = strat_vars]
+                             sample_tkit = sum(sample) ),by = strat_vars]
+
+  })
+
+
 
   return(data_out)
 }

@@ -61,8 +61,8 @@ CalcDividend_gor <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
     det[, dividend := (total_annual_exp * illicit_prop) + (total_annual_exp * (1-illicit_prop))*div]
 
-    det[, c("smk_prev_se","income_sim", "n_smokers_se",
-            "se_week_spend", "population", "sample_tkit") := NULL]
+    det[, c("se_week_spend", "population", "sample_tkit") := NULL]
+    #"n_smokers_se","smk_prev_se","income_sim",
 
     data_out <- copy(det)
   } else if (prob == TRUE) {
@@ -101,10 +101,10 @@ CalcDividend_gor <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
     prob[, prob_dividend := (prob_total_annual_exp * illicit_prop) + (prob_total_annual_exp * (1-illicit_prop))*div]
 
-    prob[, c("smk_prev", "smk_prev_se", "n_smokers",
+    prob[, c("smk_prev", "n_smokers",
              "se_week_spend", "mean_week_spend","sample_tkit",
-             "pop_n", "population", "income_sim", "income") := NULL]
-    #"n_smokers_se",
+             "pop_n", "population", "income_sim") := NULL]
+    #"n_smokers_se",, "smk_prev_se", "income"
     data_out <- copy(prob)
   }
 

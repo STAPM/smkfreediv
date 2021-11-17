@@ -10,13 +10,14 @@ Authors@R: person(given = "Damon",
 Maintainer: Damon Morris <d.j.morris@sheffield.ac.uk>
 Description: Uses the Smoking Toolkit Study and ONS data to produce estimates
     of tobacco spending by local authority and other socio-economic breakdowns to
-    calculate the potential dividend to local areas from individuals quitting smoking
+    calculate the potential dividend to local areas from individuals quitting smoking.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.1.1
 Imports:
-    data.table
+    data.table,
+    spatstat
 Depends: 
     R (>= 2.10)
 Suggests: 

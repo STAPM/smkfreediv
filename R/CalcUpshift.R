@@ -64,29 +64,31 @@ CalcUpshift <- function(data = data,
   #################################
   # Total Spending Calc - Toolkit #
 
-  # calculate mean weekly expenditure by local authority
+  # calculate mean weekly expenditure by local authority from the toolkit data
   exp <- smkfreediv::CalcWeekSpend(data = data,
                                    strat_vars = c("UTLAcode","UTLAname"),
                                    upshift = 1)
 
-  # merge in tobacco profiles
+  # merge in tobacco profiles to multiply the mean by local authority by the
+  # number of smokers in the local authority
   merge <- merge(exp, smkfreediv::PHE_tobacco_profiles, by = c("UTLAcode","UTLAname"))
 
-  # calculate total expenditure
-
+  # calculate total weekly expenditure and total annual expenditure
   merge[,tot_weekly_exp := n_smokers*mean_week_spend]
   merge[,tot_annual_exp := n_smokers*mean_week_spend*52.25]
 
   merge <- merge[,c("UTLAname","UTLAcode","n_smokers",
                     "mean_week_spend","tot_weekly_exp","tot_annual_exp")]
 
+  # total spending on tobacco in England (toolkit estimate)
   total_annual_spend <- sum(merge$tot_annual_exp, na.rm = TRUE)
 
   ##############################
   # Total Spending Calc - HMRC #
 
   ## grab total duty for both products from the same year as deflating prices to. adjust the
-  ## total duties to an England-only figure
+  ## total duties to an England-only figure by proportion of UK smokers who
+  ## live in england (calculated from APS)
 
   tot_duty_fm  <- as.numeric(receipts_data[year == deflate_to[2],"FM_cigs"])
   tot_duty_ryo <- as.numeric(receipts_data[year == deflate_to[2],"RYO_tob"])
@@ -96,17 +98,21 @@ CalcUpshift <- function(data = data,
     tot_duty_ryo <- tot_duty_ryo*smkfreediv::prop_smokers_ENG
   }
 
-  ## FM Cigs
+  ## FM Cigs ##
+  # calculate excise duty paid per pack, as a percentage of price, use this
+  # to uprate the duty receipts into total expenditures
 
   total_excise_per_pack <- avt_fm*price_fm + (duty_fm/50)
 
   excise_pct_fm <- total_excise_per_pack/price_fm
 
-  tot_spend_fm <- round(tot_duty_fm/excise_pct_fm)
+  tot_legal_spend_fm <- round(tot_duty_fm/excise_pct_fm)
 
   ## RYO tob
+  # calculate excise duty paid per pack, as a percentage of price, use this
+  # to uprate the duty receipts into total expenditures
 
-  # deflation factor for prices
+  # deflation factor for RYO prices
   frm_yr <- as.numeric(prices_data[month == deflate_from[1] & year == deflate_from[2]],"price")
   frm_yr <- frm_yr[1]
   to_yr  <- as.numeric(prices_data[month == deflate_to[1] & year == deflate_to[2]],"price")
@@ -119,21 +125,32 @@ CalcUpshift <- function(data = data,
 
   excise_pct_ryo <- total_excise_per_100g/price_ryo_d
 
-  tot_spend_ryo <- round(tot_duty_ryo/excise_pct_ryo)
+  tot_legal_spend_ryo <- round(tot_duty_ryo/excise_pct_ryo)
 
+  ####################
+  ## Calculate Illicit Spending
+
+  illicit <- smkfreediv::IllicitSpend(tot_legal_spend_fm = tot_legal_spend_fm,
+                                      tot_legal_spend_ryo = tot_legal_spend_ryo)
+
+  ###############################
   ## sum up RYO and FM figures
 
-  legal <- tot_spend_fm + tot_spend_ryo
+  tot_spend_fm  <- tot_legal_spend_fm + illicit[["tot_illicit_spend_fm"]]
+  tot_spend_ryo <- tot_legal_spend_ryo + illicit[["tot_illicit_spend_ryo"]]
 
-  ## create the amount of illicit spending
+  total_annual_spend_hmrc = tot_spend_fm + tot_spend_ryo
 
-  if (adjust == TRUE) {
-  illicit = (legal/(1 - illicit_prop)) - legal
-  } else if (adjust == FALSE) {
-  illicit = 0
-  }
+  illicit_prop <- (illicit[["tot_illicit_spend_fm"]] + illicit[["tot_illicit_spend_ryo"]]) / total_annual_spend_hmrc
 
-  total_annual_spend_hmrc = legal + illicit
+  ## create the amount of illicit spending (Howard Reed calcs)
+
+  #illicit_prop = 1298 / (14307 + 1298)
+  #if (adjust == TRUE) {
+  #illicit = (legal/(1 - illicit_prop)) - legal
+  #} else if (adjust == FALSE) {
+  #illicit = 0
+  #}
 
   ######################################
   ## CALCULATE THE UPSHIFT MULTIPLIER ##
@@ -159,7 +176,8 @@ return(list(upshift = upshift,
             avt  = avt_fm*price_fm,
             total_excise_per_pack = total_excise_per_pack,
             excise_pct_fm = excise_pct_fm,
-            tot_spend_fm = tot_spend_fm,
+            tot_legal_spend_fm = tot_legal_spend_fm,
+            tot_illicit_spend_fm = illicit[["tot_illicit_spend_fm"]],
             tot_duty_ryo = tot_duty_ryo,
             price_ryo = price_ryo,
             deflator = deflator,
@@ -167,10 +185,11 @@ return(list(upshift = upshift,
             duty_ryo    = duty_ryo,
             duty_ryo_pp = duty_ryo/10,
             excise_pct_ryo = excise_pct_ryo,
-            tot_spend_ryo = tot_spend_ryo,
+            tot_legal_spend_ryo = tot_legal_spend_ryo,
+            tot_illicit_spend_ryo = illicit[["tot_illicit_spend_ryo"]],
+            illicit_prop = illicit_prop,
             total_annual_spend_hmrc = total_annual_spend_hmrc,
             total_annual_spend_surv = total_annual_spend_surv,
             svy_data = source
             ))
 }
-

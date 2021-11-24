@@ -84,6 +84,14 @@
 #' @format
 "prop_smokers_ENG"
 
+#' Tax Gap Market Share Data
+#'
+#' Based on the most recently available data (2016/2017), the breakdown of UK tobacco
+#' consumption by product into duty-paid, illicit, and cross-border consumption.
+#'
+#' @format
+#' @source \href{https://www.gov.uk/government/statistics/tobacco-tax-gap-estimates}{Tobacco Tax Gap}
+"tax_gap_data"
 
 #' Tobacco Duty Receipts
 #'

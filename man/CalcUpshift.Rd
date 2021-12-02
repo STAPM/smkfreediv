@@ -16,8 +16,7 @@ CalcUpshift(
   deflate_to = c(12, 2018),
   receipts_data = smkfreediv::tobacco_duty_receipts,
   prices_data = smkfreediv::price_cigs,
-  adjust = TRUE,
-  illicit_prop = 1298/(14307 + 1298)
+  adjust = TRUE
 )
 }
 \arguments{
@@ -47,8 +46,6 @@ prices should be deflated.}
 
 \item{adjust}{Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
 use total UK tobacco duty receipt figure.}
-
-\item{illicit_prop}{Numeric. The proportion of total tobacco expenditure which is illicit.}
 }
 \value{
 

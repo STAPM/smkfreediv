@@ -181,10 +181,10 @@ CleanToolkit <- function(data = data,
   ### tidy up so the names and codes match exactly to the tobacco profiles
 
   # name of Buckinghamshire
-  data_out[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
+  #data_out[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
 
   # Buckinghamshire code
-  data_out[UTLAcode == "E10000002", UTLAcode := "E06000060"]
+  #data_out[UTLAcode == "E10000002", UTLAcode := "E06000060"]
 
   # fix mis-match of Bristol naming
   data_out[UTLAcode == "E06000023", UTLAname := "Bristol"]

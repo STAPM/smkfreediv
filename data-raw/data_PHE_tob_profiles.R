@@ -1,19 +1,44 @@
 library(data.table)
 
-profiles <- read.csv("data-raw/PHE tobacco profiles 2019 with region UTLA.csv")
+## https://fingertips.phe.org.uk/profile/tobacco-control/data#page/0/gid/1938132885/pat/6/ati/302/are/E06000037/iid/93798/age/168/sex/4/cat/-1/ctp/-1/yrr/1/cid/4/tbm/1
+
+## Geography version : Counties and UAs (2019/20)
+## Geography : Area type to group areas by - Region
+## Topic: Smoking prevalence in adults
+
+region_list <- c("southeast","southwest","london","eastofengland",
+                 "eastmidlands","westmidlands","yorks",
+                 "northeast","northwest")
+
+for (r in region_list) {
+
+profiles <- read.csv(paste0("data-raw/local tobacco profiles/",r," 2019.csv"))
 setDT(profiles)
 
 profiles <- profiles[Area.Code != "E92000001",]
 
-profiles <- profiles[,c("Parent.Name","AreaName","Area.Code","Value",
-                        "Upper.CI.95.0.limit","Lower.CI.95.0.limit",
-                        "Count")]
-
-profiles[, Count := as.numeric(gsub(",","",Count))]
+profiles <- profiles[Indicator.Name == "Smoking Prevalence in adults (18+) - current smokers (APS)" &
+                       Parent.Name != "",
+                        c("Parent.Name","AreaName","Area.Code","Value",
+                        "Upper.CI.95.0.limit","Lower.CI.95.0.limit","Count")]
 
 setnames(profiles,
          names(profiles),
          c("gor","UTLAname","UTLAcode","smk_prev","smk_prev_uci","smk_prev_lci","n_smokers"))
+
+###
+
+if (r == "southeast") {
+data_out <- copy(profiles)
+} else {
+data_out <- rbindlist(list(data_out,profiles))
+}
+
+rm(profiles)
+
+}
+
+profiles <- copy(data_out)
 
 ## get confidence interval on the number of smokers by backing out the population from
 ## the prevalence estimate and number of smokers, then applying the prevalence confidence

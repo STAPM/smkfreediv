@@ -56,10 +56,10 @@
 
 #' Population.
 #'
-#' Mid-2018 ONS population estimates by age and sex.
+#' Mid-2019 ONS 18+ population estimates by local authority.
 #'
 #' @format
-#' @source \href{https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland}{Population Data by age, gender, local authority}
+#' @source \href{https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland}{ONS Population Data}
 "pop_counts"
 
 #' Price of Cigarettes

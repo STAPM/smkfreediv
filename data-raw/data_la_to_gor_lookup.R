@@ -27,7 +27,7 @@ setDT(lookup)
 setnames(lookup, names(lookup), c("UTLAname","gor"))
 
 lookup <- lookup[order(UTLAname),]
-lookup[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
+#lookup[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
 
 
 #n <- smkfreediv::localauthorities[substr(UTLAcode,1,1) == "E",]

@@ -42,7 +42,7 @@ CalcDividend_gor_sim <- function(data,
 
   income <- smkfreediv::GetIncome(income_data = smkfreediv::income,
                                   income_var = 3)
-  income <- merge(income, smkfreediv::utla_gor_lookup, by = "UTLAname")
+  income <- merge(income, smkfreediv::PHE_tobacco_profiles[,c("gor","UTLAname")], by = "UTLAname")
 
   income <- income[, .(income = weighted.mean(income, w = population),
                                  population = sum(population)), by = "gor"]

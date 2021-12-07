@@ -26,8 +26,6 @@ CalcDividend_gor <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
   ## grab the tobacco profiles and merge to mean expenditure
 
-  profiles = merge(profiles, smkfreediv::utla_gor_lookup, by = "UTLAname")
-
   profiles[!is.na(smk_prev), smk_prev_sim := rnorm(1,mean = smk_prev, sd = smk_prev_se), by = "UTLAname"]
   profiles[!is.na(n_smokers), n_smokers_sim := rnorm(1,mean = n_smokers, sd = n_smokers_se), by = "UTLAname"]
 

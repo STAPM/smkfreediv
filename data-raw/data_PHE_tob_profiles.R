@@ -79,11 +79,21 @@ m_n_smokers   <- m_s[,"n_smokers_se"]
 
 profiles <- cbind(profiles,m_n_smokers)
 
-profiles <- profiles[,c("UTLAcode","UTLAname","pop_n",
+profiles <- profiles[,c("gor","UTLAcode","UTLAname","pop_n",
                         "smk_prev","smk_prev_se",
                         "n_smokers","n_smokers_se")]
 
 PHE_tobacco_profiles <- copy(profiles)
+
+PHE_tobacco_profiles[gor == "London region", gor := "London"]
+PHE_tobacco_profiles[gor == "Yorkshire and the Humber region", gor := "Yorkshire and the Humber"]
+PHE_tobacco_profiles[gor == "West Midlands region", gor := "West Midlands"]
+PHE_tobacco_profiles[gor == "East Midlands region", gor := "East Midlands"]
+PHE_tobacco_profiles[gor == "South East region", gor := "South East"]
+PHE_tobacco_profiles[gor == "South West region", gor := "South West"]
+PHE_tobacco_profiles[gor == "North East region", gor := "North East"]
+PHE_tobacco_profiles[gor == "North West region", gor := "North West"]
+PHE_tobacco_profiles[gor == "East of England region", gor := "East of England"]
 
 PHE_tobacco_profiles <- PHE_tobacco_profiles[order(UTLAname),]
 

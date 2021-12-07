@@ -109,6 +109,9 @@ CleanToolkit <- function(data = data,
                                        "East Midlands","West Midlands","East of England",
                                        "London","South East","South West"))]
 
+  data[gor == "Yorkshire and The Humber", gor := "Yorkshire and the Humber"]
+
+
   ## age and sex
 
   data[, Sex := factor(Sex, levels = c("Men","Women"), labels = c("Male","Female"))]

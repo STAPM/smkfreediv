@@ -7,22 +7,15 @@
 #' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7cb/mm23}{Tobacco CPI time series}
 "cpi_tobacco"
 
-#' Local Authority Data.
+#' Local Authority Income Data.
 #'
 #' A dataset containing lower tier local authorities income and population counts. Raw data gives
 #' model-based income estimates at Middle layer Super Output Area (MSOA) level, which are aggregated to lower-tier
-#' local authority level.
+#' local authority level by simple mean averaging.
 #'
 #' @format
 #' @source \href{https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales}{Income Data}
 "income"
-
-#' Local Authority to Region Lookup
-#'
-#' A lookup table to match local authority districts to government office region geographies.
-#'
-#'
-"la_gor_lookup"
 
 #' Local Authority Names and Codes.
 #'
@@ -102,9 +95,3 @@
 #' @source \href{https://www.gov.uk/government/statistics/tobacco-bulletin}{ONS Tobacco Bulletin}
 "tobacco_duty_receipts"
 
-#' Upper Tier Local Authority to Region Lookup
-#'
-#' A lookup table to match local authority districts to government office region geographies.
-#'
-#'
-"utla_gor_lookup"

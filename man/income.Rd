@@ -3,7 +3,7 @@
 \docType{data}
 \name{income}
 \alias{income}
-\title{Local Authority Data.}
+\title{Local Authority Income Data.}
 \format{
 
 }
@@ -16,6 +16,6 @@ income
 \description{
 A dataset containing lower tier local authorities income and population counts. Raw data gives
 model-based income estimates at Middle layer Super Output Area (MSOA) level, which are aggregated to lower-tier
-local authority level.
+local authority level by simple mean averaging.
 }
 \keyword{datasets}

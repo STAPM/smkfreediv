@@ -2,12 +2,12 @@ library(readxl)
 library(data.table)
 library(stringr)
 
-reps <- 20000
+reps <- 1000
 set.seed(2021)
 
 #################################################################################
 ######### Get LTLA level income data and population data to use to weight up
-######### the income data to UTLA level
+######### the income data to UTLA level in the dividend calculations
 
 ### Read population data
 
@@ -295,8 +295,8 @@ income <- income[order(UTLAname),]
 
 ### tidy up so the names and codes match exactly to the tobacco profiles
 
-income[UTLAname == "Buckinghamshire", UTLAcode := "E06000060"]
-income[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
+#income[UTLAname == "Buckinghamshire", UTLAcode := "E06000060"]
+#income[UTLAname == "Buckinghamshire", UTLAname := "Buckinghamshire UA"]
 
 # fix mis-match of Bristol naming
 income[UTLAcode == "E06000023", UTLAname := "Bristol"]

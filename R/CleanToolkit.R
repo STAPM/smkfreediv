@@ -110,6 +110,7 @@ CleanToolkit <- function(data = data,
                                        "London","South East","South West"))]
 
   data[gor == "Yorkshire and The Humber", gor := "Yorkshire and the Humber"]
+  data[, gor := as.character(gor)]
 
 
   ## age and sex

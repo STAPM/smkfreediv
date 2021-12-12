@@ -14,6 +14,7 @@ CalcUpshift(
   duty_ryo = 234.65,
   deflate_from = c(12, 2020),
   deflate_to = c(12, 2018),
+  profiles_data = smkfreediv::PHE_tobacco_profiles,
   receipts_data = smkfreediv::tobacco_duty_receipts,
   prices_data = smkfreediv::price_cigs,
   adjust = TRUE
@@ -39,6 +40,8 @@ the price of hand-rolled tobacco.}
 
 \item{deflate_to}{Numeric vector with 2 arguments containing the month and year to which hand-rolled tobacco
 prices should be deflated.}
+
+\item{profiles_data}{Data table. PHE tobacco profiles.}
 
 \item{receipts_data}{Data table. Tobacco duty receipts data.}
 

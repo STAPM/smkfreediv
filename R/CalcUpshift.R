@@ -23,6 +23,7 @@
 #' the price of hand-rolled tobacco.
 #' @param deflate_to Numeric vector with 2 arguments containing the month and year to which hand-rolled tobacco
 #' prices should be deflated.
+#' @param profiles_data Data table. PHE tobacco profiles.
 #' @param receipts_data Data table. Tobacco duty receipts data.
 #' @param prices_data Data table. Price data for a 20-pack of cigarettes.
 #' @param adjust Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
@@ -55,6 +56,7 @@ CalcUpshift <- function(data = data,
                         duty_ryo = 234.65,
                         deflate_from = c(12,2020),
                         deflate_to = c(12,2018),
+                        profiles_data = smkfreediv::PHE_tobacco_profiles,
                         receipts_data = smkfreediv::tobacco_duty_receipts,
                         prices_data = smkfreediv::price_cigs,
                         adjust = TRUE) {
@@ -62,24 +64,16 @@ CalcUpshift <- function(data = data,
   #################################
   # Total Spending Calc - Toolkit #
 
-  # calculate mean weekly expenditure by local authority from the toolkit data
-  exp <- smkfreediv::CalcWeekSpend(data = data,
-                                   strat_vars = c("UTLAcode","UTLAname"),
-                                   upshift = 1)
+  # calculate mean weekly expenditure
+  tot_mean_spend <- round( as.numeric( smkfreediv::CalcWeekSpend(data, strat_vars = NULL, upshift = 1)[,"mean_week_spend"] ), 2)
 
-  # merge in tobacco profiles to multiply the mean by local authority by the
-  # number of smokers in the local authority
-  merge <- merge(exp, smkfreediv::PHE_tobacco_profiles, by = c("UTLAcode","UTLAname"))
+  # number of smokers
+  tot_smokers    <- round( sum(profiles_data[, "n_smokers"], na.rm = T) )
 
   # calculate total weekly expenditure and total annual expenditure
-  merge[,tot_weekly_exp := n_smokers*mean_week_spend]
-  merge[,tot_annual_exp := n_smokers*mean_week_spend*52.25]
 
-  merge <- merge[,c("UTLAname","UTLAcode","n_smokers",
-                    "mean_week_spend","tot_weekly_exp","tot_annual_exp")]
-
-  # total spending on tobacco in England (toolkit estimate)
-  total_annual_spend <- sum(merge$tot_annual_exp, na.rm = TRUE)
+  total_weekly_spend <- (tot_mean_spend * tot_smokers )/1000000
+  total_annual_spend <- (tot_mean_spend * tot_smokers * 52)/1000000
 
   ##############################
   # Total Spending Calc - HMRC #
@@ -159,8 +153,8 @@ CalcUpshift <- function(data = data,
     source = "LCFS"
 
     } else {
-    upshift <- total_annual_spend_hmrc/(total_annual_spend/1000000)
-    total_annual_spend_surv <- (total_annual_spend/1000000)
+    upshift <- total_annual_spend_hmrc/total_annual_spend
+    total_annual_spend_surv <- total_annual_spend
     source = "Toolkit"
 
   }

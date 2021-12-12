@@ -48,7 +48,7 @@ data <- melt(data,
 
 ryo <- copy(data)
 
-##### Merge and retain most recent year
+##### Merge and retain most recent year (2016-17 tax year)
 
 data <- merge(fm, ryo, by = c("Source","year"), sort = F)
 

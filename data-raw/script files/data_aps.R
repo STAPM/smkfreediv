@@ -7,8 +7,8 @@
 library(data.table)
 library(apsclean)
 
-root <- "D:/"
-file <- "Datasets/Annual Population Survey/tab/"
+root <- "C:/"
+file <- "Users/damon/OneDrive/Documents/Datasets/Annual Population Survey/tab/"
 
 data <- apsclean::combine_years(list(aps_read_2011(root, file),
                                      aps_read_2012(root, file),

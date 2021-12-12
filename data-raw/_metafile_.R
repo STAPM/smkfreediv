@@ -5,3 +5,6 @@ source("data-raw/script files/data_aps.R") ## estimate an English-smokers propor
 ## HMRC data
 source("data-raw/script files/data_tobacco_duty.R") ## tobacco duties time series
 source("data-raw/script files/data_tax_gap.R") ## tax gap estimates
+
+## Income data
+source("data-raw/script files/data_income_plus_pop2019.R") ## income data

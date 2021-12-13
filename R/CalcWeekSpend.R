@@ -24,7 +24,7 @@ CalcWeekSpend <- function(data,
 
   ### missing expenditure as 0
 
-  mean_calcs[is.na(weekspend) & Smoker == 1, weekspend := 0]
+  #mean_calcs[is.na(weekspend) & Smoker == 1, weekspend := 0]
 
   ### apply upshift factor to mean weekly spending
   mean_calcs[, weekspend := weekspend * upshift]

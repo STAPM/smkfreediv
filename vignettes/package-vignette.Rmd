@@ -24,8 +24,7 @@ library(scales)
 
 ## Introduction
 
-The purpose of this vignette is to explain how to use the package `smkfreediv` package to produce estimates of 
-the smoke free dividend for local authorities in England.
+The purpose of this vignette is to explain how to use the package `smkfreediv` package to produce estimates of the smoke free dividend for local authorities in England. The analysis produced here can be replicated using the `smkfreediv` package and dependencies - all functions and data needed are stored within the package.
 
 ### Smoke free Dividend 
 
@@ -55,7 +54,7 @@ head(smkfreediv::PHE_tobacco_profiles[UTLAname %in% c("Barnsley","Sheffield","Do
 
 Data on the number of smokers by local authority is required to calculate total expenditure on tobacco by local authority, by combining this information with the mean expenditure produced using the toolkit data. The tobacco profiles include information on the local authority smoking population, smoking prevalence, and confidence intervals for smoking prevalence. 
 
-A standard error for the number of smokers is not included in the tobacco profiles, so is obtained by calculating the total local authority population from the smoking prevalence and number of smokers figures. The smoking prevalence figure is then simulated using its point estimate and standard error and applied to the population figure to give a distribution of number of smokers from which a standard deviation can be calculated to proxy the standard error. 50,000 simulation replications are used to produce the standard deviation included with the tobacco profiles data in `smkfreediv::tobacco_profiles`. 
+A standard error for the number of smokers is not included in the tobacco profiles, so is obtained by calculating the total local authority population from the smoking prevalence and number of smokers figures. The smoking prevalence figure is then simulated using its point estimate and standard error and applied to the population figure to give a distribution of number of smokers from which a standard deviation can be calculated to proxy the standard error. 50,000 simulation replications are used to produce the standard deviation included with the tobacco profiles data in `smkfreediv::PHE_tobacco_profiles`. 
 
 The plot below gives an example of the uncertainty around the smoking prevalence figures. For each of the four local authority districts in South Yorkshire, 1,000 values for smoking prevalence are drawn at random from normal distributions characterised by setting the mean equal to the point estimate for the local authority in the tobacco profiles, and the standard deviation equal to the standard error. 
 
@@ -125,34 +124,47 @@ We are able to produce three income measures from this data source:
 There are other sources of data used to inform the calculation of the Upshift factor, described in more detail below. Part of the method for calculating upshift is to infer total expenditure on tobacco in the population from HMRC duty receipts for different tobacco products. This data is obtained from the ONS Tobacco Bulletin for July 2021 and stored in the package as `smkfreediv::tobacco_duty_receipts`. Data is available for calender years 1992 to 2020. 
 
 ```{r duties_tob, echo = FALSE, fig.cap="Total Duty Receipts from Tobacco Products 2000-2020", fig.dim = c(6,4) }
-data <- smkfreediv::tobacco_duty_receipts[year >= 2000,]
 
-data <- melt(data,
-             id.vars = "year",
-             value.name = "Duty",
-             variable.name = "Product")
+## produce summary statistics and descriptive plots of the
+## tobacco duties data
 
-ggplot(data = data) +
-  aes(x = year, y = Duty, color = Product) +
-  geom_point() +
-  geom_line() +
-  geom_vline(xintercept = 2018) +
+duties <- smkfreediv::tobacco_duty_receipts[year %in% 2000:2020,]
+
+# CPI is monthly, use a mid-year figure (June)
+cpi <- smkfreediv::cpi_tobacco[Year %in% 2000:2020 & month == 6, "cpi"]
+
+duties <- cbind(duties,cpi)
+
+############################
+## plot duties over time ###
+
+duties_plot <- melt(duties[,c("year","cpi","FM_cigs","RYO_tob","Total")],
+                    id.vars = c("year","cpi"),
+                    value.name = "duty",
+                    variable.name = "Product")
+
+duties_plot[, duty := duty*smkfreediv::prop_smokers_ENG]
+duties_plot[, Product := factor(Product,
+                                levels = c("FM_cigs","RYO_tob","Total"),
+                                labels = c("Cigarettes","HRT","Total"))]
+
+duties_plot[, duty_real := duty*(100/cpi)]
+
+ggplot(duties_plot) +
+  geom_line( aes(x = year, y = duty,      color = Product), linetype = 1 ) +
+  geom_point(aes(x = year, y = duty,      color = Product, shape = Product)) +
+  geom_line( aes(x = year, y = duty_real, color = Product), linetype = 2 ) +
+  geom_point(aes(x = year, y = duty_real, color = Product, shape = Product)) +
   theme_minimal() +
-  labs(y = "Duty (£m)",
-       x = " ") +
-  scale_y_continuous(breaks = seq(0,9000,1000), labels = function(x) paste0("£",x)) +
-  scale_x_continuous(breaks = seq(2000,2020,1), minor_breaks = NULL) +
-  theme(legend.position = "bottom",
-        axis.text.x = element_text(angle = 45))
+  theme(legend.position = "bottom") +
+  labs(y = "Duty receipts (£m)", x = " ",
+       caption = "dashed lines represent real terms duties in December 2018 prices (CPI All Tobacco)")
+
+
+
 ```
 
-## Methods
-
-### (i) Cleaning the Toolkit Data
-
-This stage uses the `CleanToolkit` and `DeflateToolkit` functions. The first selects the time frame of the sample, selects and cleans variables. 
-
-The second function is applied to the cleaned data to adjust expenditures for inflation using the tobacco component of the Consumer Price Index (CPI) so all values are expressed in December 2018 prices. Inflation data is stored in `smkfreediv::cpi_tobacco` which is [obtained from the ONS](https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7cb/mm23)
+Inflation data is stored in `smkfreediv::cpi_tobacco` which is [obtained from the ONS](https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7cb/mm23). This data is used to adjust tobacco expenditures and prices to a common time. December 2018 is used throughout. 
 
 ```{r cpi_tob, echo = FALSE, fig.cap="Tobacco Consumer Price Index (CPI) 2000-2021", fig.dim = c(6,4) }
 data <- smkfreediv::cpi_tobacco
@@ -173,29 +185,177 @@ ggplot(data = data) +
   geom_hline(yintercept = 100)
 ```
 
+## Methods
+
+### (i) Cleaning the Toolkit Data
+
+This stage uses the `ReadToolkit`, `CleanToolkit` and `DeflateToolkit` functions. The first reads in the data from the .sav format it is provided in, the second selects the time frame of the sample and selects and cleans variables. The third function adjusts expenditures for inflation. The final dataset produced is saved to the package as the object `TOOLKIT`. The code below can be used to recreate the data used in this analysis, using the corresponding raw toolkit data file.
+
+```{r clean_toolkit, eval = FALSE}
+
+## (1) Read in the raw SPSS data file
+
+data_file <- "omni174_39.1_65.2cot_31.3a_25.4s_recodes_60.5sa.sav"
+
+toolkit_raw <- smkfreediv::ReadToolkit(path = path,
+                                       data = data_file,
+                                       save = FALSE)
+
+## (2) Clean the data, retain only needed variables and waves
+
+toolkit_clean <- smkfreediv::CleanToolkit(data = toolkit_raw,
+                                          start_month = 90,
+                                          end_month = 160)
+
+## (3) Deflate expenditure to December 2018
+
+TOOLKIT <- smkfreediv::DeflateToolkit(data = toolkit_clean,
+                                      index = smkfreediv::cpi_tobacco,
+                                      base_month = 12,
+                                      base_year = 2018)
+
+```
+
+The distribution of the expenditures observed in the data:
+
+```{r spend_dist, echo = FALSE, warning = FALSE, fig.cap="Distribution of Real-Terms Weekly Expenditure on Tobacco", fig.dim = c(6,4) }
+
+## produce summary statistics and descriptive plots of the
+data <- smkfreediv::TOOLKIT
+data <- data[!(is.na(gor)),]
+
+#### Distribution of weekly spending
+
+exp <- smkfreediv::CalcWeekSpend(data, strat_vars = NULL, upshift = 1)
+
+med <- as.numeric(exp[,"median_week_spend"])
+mean   <- as.numeric(exp[,"mean_week_spend"])
+
+ggplot(data) +
+  aes(x = weekspend) +
+  geom_density(alpha = 0.2) +
+  geom_vline(xintercept = mean, color = "navy", linetype = 2) +
+  geom_vline(xintercept = med, color = "maroon", linetype = 2) +
+  theme_minimal() +
+  scale_fill_viridis_d(option = "mako") +
+  labs(y = " ", x = "Weekly Tobacco Spending (£)",
+       caption = paste0("Median Weekly Spend = £",round(med,2),". Mean Weekly Spend = £",round(mean,2),"."))
+
+```
+
+The next plot shows the distribution of spending within regions, and compares the region-level medians.
+
+```{r spend_dist_region, echo = FALSE, warning = FALSE, fig.cap="Distribution of Real-Terms Weekly Expenditure on Tobacco by Region", fig.dim = c(6,4) }
+data[, gor := factor(gor,
+                     levels = c("North East", "West Midlands", "London",
+                                "Yorkshire and the Humber", "East of England",
+                                "East Midlands", "North West", "South East", "South West") )]
+
+ggplot(data) +
+  aes(x=reorder(gor,weekspend, FUN = "median", na.rm = TRUE),
+      y = weekspend,
+      fill = gor) +
+  theme_minimal() +
+  coord_flip() +
+  geom_boxplot(outlier.alpha = 0.5) +
+  scale_fill_viridis_d(option = "mako") +
+  theme(legend.position = "none") +
+  labs(x = " ", y = "Weekly Tobacco Spending (£)",
+       caption = "outliers are points more than 1.5*IQR above the 3rd quartile")
+
+```
 
 ### (ii) Calculating the Upshift
 
-The first step is to calculate the amount by which individual spending is upshifted. Spending is upshfifted because of discrepancy between the implied total spending by the toolkit data and the reported duty receipts by HMRC. 
+The first step is to calculate the amount by which individual spending needs to be upshifted. Spending is upshfifted because of discrepancy between the implied total spending by the toolkit data and the reported duty receipts by HMRC. The function used to calculate the upshift is `CalcUpshift`, demonstrated below. Also - called by `CalcUpshift` - is the `IllicitSpend` function.
 
-The upshift factor is calculated by the `CalcUpshift` function, which is illustrated below. The amount by which expenditures need to be upshifted is determined by calculating the total expenditures on tobacco implied by (i) grossing up weekly expenditure to the population and annualising, and (ii) using data on total annual HMRC duty receipts and average prices. The upshift factor is then the ratio of the latter to the former.
+```{r upshift_func, echo = TRUE}
+
+## Toolkit data to apply upshift to
+data <- smkfreediv::TOOLKIT
+
+## Set prices and duties as they were at december 2018
+price_fm <- as.numeric(smkfreediv::price_cigs[year == 2018 & month == 12,"price"])
+
+duty_fm <- 228.29
+avt_fm <- 0.165
+price_ryo <- 51.60
+duty_ryo <- 234.65
+
+## Calculate the upshift
+upshift <- smkfreediv::CalcUpshift(data = data,
+                                   LCFS = FALSE,
+                                   price_fm = price_fm,
+                                   duty_fm = duty_fm,
+                                   avt_fm = avt_fm,
+                                   price_ryo = price_ryo,
+                                   duty_ryo = duty_ryo,
+                                   deflate_from = c(12,2020),
+                                   deflate_to = c(12,2018))
+
+
+```
+
+Using this function, the estimated upshift is `r upshift$upshift`. This figure is determined within the function by calculating the total expenditures on tobacco implied by (i) grossing up weekly expenditure to the population and annualising, and (ii) using data on total annual HMRC duty receipts and average prices. The upshift factor is then the ratio of the latter to the former. The calculations within `CalcUpshift` are described in further detail below.
 
 #### Total Expenditure - Survey Data
 
-First we calculate the weekly tobacco expenditure of the mean smoker in the Toolkit sample by applying the `CalcWeekSpend` function, setting the upshift factor to equal 1 (i.e. no upshifting). The mean is calculated using the sample weights and is stratified by upper tier local authority. We then merge the local authority level mean expenditures to the Public Health England tobacco profiles, multiplying mean local authority expenditure per smoker by the number of smokers in the local authority. This figure is then annualised and summed over local authorities to produce an estimate of total population expenditure on tobacco in a single year. 
+Weekly tobacco expenditure of the mean smoker in the toolkit sample is calculated by applying the `CalcWeekSpend` function, setting the upshift factor to equal 1 (i.e. no upshifting) and using the toolkit sample weights. This figure is then multiplied by the total number of smokers in the tobacco profiles, and then by 52 to obtain the annual figure.
+
+```{r total_spend_surv, echo = TRUE}
+  #################################
+  # Total Spending Calc - Toolkit #
+
+  profiles_data <- smkfreediv::PHE_tobacco_profiles
+
+  # calculate mean weekly expenditure
+  tot_mean_spend <- round( as.numeric( smkfreediv::CalcWeekSpend(
+    
+    data,         
+    strat_vars = NULL, 
+    upshift = 1)[,"mean_week_spend"] 
+    
+    ), 2)
+
+  # number of smokers
+  tot_smokers    <- round( sum(profiles_data[, "n_smokers"], na.rm = T) )
+
+  # calculate total weekly expenditure and total annual expenditure
+
+  total_weekly_spend <- (tot_mean_spend * tot_smokers )/1000000
+  total_annual_spend <- (tot_mean_spend * tot_smokers * 52)/1000000
+```
+
+This yields an estimated annual spend, based on toolkit and APS data informing the profiles, of £`r round(total_annual_spend)/1000`bn.
+
+
+#### Total Expenditure - HMRC Receipts
 
 ```{r, include = FALSE}
 tot_duty_fm  <- round(as.numeric(smkfreediv::tobacco_duty_receipts[year == 2018,"FM_cigs"]))
 tot_duty_ryo <- round(as.numeric(smkfreediv::tobacco_duty_receipts[year == 2018,"RYO_tob"]))
+
+tot_duty_fm  <- tot_duty_fm*smkfreediv::prop_smokers_ENG
+tot_duty_ryo <- tot_duty_ryo*smkfreediv::prop_smokers_ENG
 ```
 
-#### Total Expenditure - HMRC Receipts
+To calculate the expenditures from HMRC duty receipts, we obtain the duty receipts for calendar 2018 from the `smkfreediv::tobacco_duty_receipts` data described above, separately for cigarettes (£`r round(tot_duty_fm)/1000`bn) and hand-rolled tobacco (£`r round(tot_duty_ryo)/1000`bn). These tax receipt figures are multiplied by `r round(smkfreediv::prop_smokers_ENG*100, 2)`% - the proportion of smokers in the UK who live in England as calculated from the Annual Population Survey 2011-2018. This adjusts the figures for total duty receipts across the UK to an England-specific estimate. 
 
-To calculate the expenditures from HMRC duty receipts, we obtain the duty receipts for calendar 2018 from the `smkfreediv::tobacco_duty_receipts` data described above, separately for cigarettes (£`r tot_duty_fm`m) and hand-rolled tobacco (£`r tot_duty_ryo`m). As these figures are UK totals, we adjust them to England-only totals by multiplying these totals by 82% - the proportion of smokers in the UK who live in England, calculated from the Annual Population Survey 2011-2018.
 
-We then estimate the proportion of total price for each product which is composed of duties and combine this with the figures for total duty receipts to calculate implied total expenditure. The calculations for expenditure are based on prices for a packet of 20 cigarettes and per 100g of hand-rolled tobacco respectively. The price of hand-rolled tobacco is taken as an average of prices from various supermarkets and deflated to December 2018 prices, again using the tobacco CPI. 
+We then estimate the proportion of total price for each product which is composed of duties and used this to adjust the total duty figures into total expenditures. The calculations for expenditure are based on prices for a packet of 20 cigarettes and per 100g of hand-rolled tobacco (HRT) respectively. The price of cigarettes is taken from the [ONS price time series](https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp) and stored in `smkfreediv::price_cigs`, which gives an average price per pack of 20 in December 2018 of £`r price_fm`. The price of HRT is taken as an average of prices from various supermarkets in December 2020 of £51.60. This is deflated to December 2018 prices using the tobacco CPI. 
 
-Taking the price of a packet of 20 factory-made cigarettes to be £8.83, the ad-valorem tax paid per pack is £1.46 (16.5% of £8.83). With a specific duty of £228.29 per 1000 cigarettes, the duty per pack of 20 is £228.29/50 = £4.57. This means a total duty of £6.02 per pack, which is 68.21% of the price. Dividing the duty figure by this proportion gives an estimate of total expenditure on factory-made cigarettes of £9,343m. A similar calculation for RYO tobacco yields a figure of £2,425m and total tobacco expenditure of £11,768m. 
+Taking the price of a packet of 20 factory-made cigarettes to be £`r price_fm`, the ad-valorem tax paid per pack is £`r avt_fm * price_fm` (`r avt_fm * 100`% of £`r price_fm`). With a specific duty of £`r duty_fm` per 1000 cigarettes, the duty per pack of 20 is £`r duty_fm`/50 = £`r round(duty_fm/50, 2)`. This means a total duty of £`r round(duty_fm/50 + avt_fm * price_fm, 2)` per pack, or `r round( 100*(duty_fm/50 + avt_fm * price_fm)/price_fm , 2)`% of the price. Dividing the total duty receipts figure by this proportion gives an estimate of total expenditure on factory-made cigarettes of £`r round(tot_duty_fm/1000 / ((duty_fm/50 + avt_fm * price_fm)/price_fm), 3)`bn £9,343m. 
+
+```{r spend_ryo, include = FALSE}
+spend_ryo <- 2.425
+spend_tot <- spend_ryo + round(tot_duty_fm/1000 / ((duty_fm/50 + avt_fm * price_fm)/price_fm), 3)
+```
+
+[[PICKUP THE EDITING FROM HERE]]
+
+A similar calculation for RYO tobacco yields a figure of £`r spend_ryo`bn and total tobacco expenditure of £`r spend_tot`bn. These figures, derived from price and duties information on legal sources of tobacco fail to account for the illicit market in tobacco products. We also incorporate the illicit market into our calculations.
+
+#### Dealing with spending on illicit tobacco
 
 #### Upshift 
 

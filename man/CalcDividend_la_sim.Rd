@@ -10,7 +10,8 @@ CalcDividend_la_sim(
   div = 0.93,
   n_sim = 100,
   seed = 2021,
-  illicit_prop = 1298/(14307 + 1298)
+  illicit_prop = 1298/(14307 + 1298),
+  income_var = 3
 )
 }
 \arguments{
@@ -25,6 +26,9 @@ CalcDividend_la_sim(
 \item{seed}{Numeric. Random number seed.}
 
 \item{illicit_prop}{Numeric. The proportion of total tobacco expenditure which is illicit.}
+
+\item{income_var}{Integer. Option governing which income variable is used. 1 for net household income,
+2 for net household income equivalised, and 3 for net household income equivalised after housing costs.}
 }
 \value{
 

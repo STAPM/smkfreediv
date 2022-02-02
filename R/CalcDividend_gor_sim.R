@@ -10,6 +10,8 @@
 #' @param n_sim Numeric. Number of simulations.
 #' @param seed Numeric. Random number seed.
 #' @param illicit_prop Numeric. The proportion of total tobacco expenditure which is illicit.
+#' @param income_var Integer. Option governing which income variable is used. 1 for net household income,
+#' 2 for net household income equivalised, and 3 for net household income equivalised after housing costs.
 #'
 #' @return
 #' @export
@@ -24,7 +26,8 @@ CalcDividend_gor_sim <- function(data,
                                  div = 0.93,
                                  n_sim = 100,
                                  seed = 2021,
-                                 illicit_prop = 1298 / (14307 + 1298)) {
+                                 illicit_prop = 1298 / (14307 + 1298),
+                                 income_var = 3) {
 
   set.seed(seed)
 
@@ -41,7 +44,7 @@ CalcDividend_gor_sim <- function(data,
   ## Grab income data
 
   income <- smkfreediv::GetIncome(income_data = smkfreediv::income,
-                                  income_var = 3)
+                                  income_var = income_var)
   income <- merge(income, smkfreediv::PHE_tobacco_profiles[,c("gor","UTLAname")], by = "UTLAname")
 
   income <- income[, .(income = weighted.mean(income, w = population),

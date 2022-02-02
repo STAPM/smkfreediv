@@ -1,4 +1,6 @@
-library(data)
+### read in cigarette prices from the ONS
+
+library(data.table)
 
 price_cigs <- read.csv("data-raw/cig_prices_ons.csv")
 setDT(price_cigs)

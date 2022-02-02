@@ -63,6 +63,33 @@
 #' @source \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp}{ONS Cigarette prices}
 "price_cigs"
 
+#' Price of Cigarettes (OECD)
+#'
+#' Prices for a pack of 20 cigarettes by country, defined as the Weighted Average Price (WAP). This is the average consumer price
+#' of a tobacco product based on the prices of individual brands and weighted by sales. This data table contains prices for 2016. For
+#' the UK the WAP for a pack of 20 cigarettes is £8.30.
+#'
+#' @docType data
+#'
+#' @format A data table (drinker_cat, product, product2, strength, mktshare).
+#'
+#' \describe{
+#'   \item{country}{}
+#'   \item{price_usd_excl_tax}{The pre-tax price (measured in USD), including producer and distributor margins.}
+#'   \item{duty_percent}{percentage of total retail price paid in specific duty.}
+#'   \item{avt_percent}{percentage of total retail price paid in duty on value (or ad-valorem tax).}
+#'   \item{vat_percent}{percentage of total retail price paid in value added tax (or equivalent, e.g. retail sales tax for the US).}
+#'   \item{tax_percent}{percentage of total retail price paid in taxation.}
+#'   \item{currency}{local currency.}
+#'   \item{price}{retail sales price in the local currency.}
+#'   \item{price_usd}{retail sales price in US dollars.}
+#' }
+#' @source
+#' \itemize{
+#' \item \href{https://www.oecd.org/tax/consumption/tax-burden-cigarettes-ctt-trends.xlsx}{OECD tax burden of cigarettes} sourced from the World Health Organisation.
+#' }
+"price_cigs_oecd"
+
 #' Proportion of English Smokers
 #'
 #' A scalar proportion of total UK smokers that are English. This is used to adjust UK total duty receipts from tobacco

@@ -13,7 +13,8 @@
 #' figure up to an annual figure and summing over local authorities.
 #'
 #' @param data Data table. The cleaned toolkit data.
-#' @param LCFS Logical. If TRUE use the LCFS grossed-up spend estimated by Howard Reed.
+#' @param LCFS Logical. If TRUE use the LCFS grossed-up spend for the UK estimated by Howard Reed.
+#' @param vat Numeric. Rate of value added tax.
 #' @param price_fm Numeric. Price of factory made cigarettes per pack of 20.
 #' @param duty_fm Numeric. Duty per 1,000 cigarettes
 #' @param avt_fm Numeric. Ad-valorem tax rate on factory made cigarettes.
@@ -26,6 +27,7 @@
 #' @param profiles_data Data table. PHE tobacco profiles.
 #' @param receipts_data Data table. Tobacco duty receipts data.
 #' @param prices_data Data table. Price data for a 20-pack of cigarettes.
+#' @param illicit_data Data table. Consumption data for illicit sources of tobacco.
 #' @param adjust Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
 #' use total UK tobacco duty receipt figure.
 #'
@@ -49,6 +51,7 @@
 #' }
 CalcUpshift <- function(data = data,
                         LCFS = FALSE,
+                        vat = 0.2,
                         price_fm = 8.83,
                         duty_fm = 228.29,
                         avt_fm = 0.165,
@@ -59,19 +62,19 @@ CalcUpshift <- function(data = data,
                         profiles_data = smkfreediv::PHE_tobacco_profiles,
                         receipts_data = smkfreediv::tobacco_duty_receipts,
                         prices_data = smkfreediv::price_cigs,
+                        illicit_data = smkfreediv::tax_gap_data,
                         adjust = TRUE) {
 
   #################################
   # Total Spending Calc - Toolkit #
 
-  # calculate mean weekly expenditure
+  # calculate mean weekly expenditure per smoker
   tot_mean_spend <- round( as.numeric( smkfreediv::CalcWeekSpend(data, strat_vars = NULL, upshift = 1)[,"mean_week_spend"] ), 2)
 
-  # number of smokers
+  # calculate total number of smokers from the tobacco profiles
   tot_smokers    <- round( sum(profiles_data[, "n_smokers"], na.rm = T) )
 
-  # calculate total weekly expenditure and total annual expenditure
-
+  # calculate total weekly expenditure and total annual expenditure (millions)
   total_weekly_spend <- (tot_mean_spend * tot_smokers )/1000000
   total_annual_spend <- (tot_mean_spend * tot_smokers * 52)/1000000
 
@@ -90,7 +93,9 @@ CalcUpshift <- function(data = data,
     tot_duty_ryo <- tot_duty_ryo*smkfreediv::prop_smokers_ENG
   }
 
-  ## FM Cigs ##
+  ########################
+  ######### FM Cigs ######
+
   # calculate excise duty paid per pack, as a percentage of price, use this
   # to uprate the duty receipts into total expenditures
 
@@ -100,7 +105,17 @@ CalcUpshift <- function(data = data,
 
   tot_legal_spend_fm <- round(tot_duty_fm/excise_pct_fm)
 
-  ## RYO tob
+  # calculate VAT
+
+  vat_fm <- (vat/(1 + vat))*price_fm
+
+  vat_pct_fm <- vat_fm/price_fm
+
+  tax_pct_fm <- (vat_fm + total_excise_per_pack)/price_fm
+
+  ############################
+  ######### RYO tobacco ######
+
   # calculate excise duty paid per pack, as a percentage of price, use this
   # to uprate the duty receipts into total expenditures
 
@@ -119,11 +134,21 @@ CalcUpshift <- function(data = data,
 
   tot_legal_spend_ryo <- round(tot_duty_ryo/excise_pct_ryo)
 
+  # calculate VAT
+
+  vat_ryo <- (vat/(1 + vat))*price_ryo_d
+
+  vat_pct_ryo <- vat_ryo/price_ryo_d
+
+  tax_pct_ryo <- (vat_ryo + total_excise_per_100g)/price_ryo_d
+
   ####################
   ## Calculate Illicit Spending
 
-  illicit <- smkfreediv::IllicitSpend(tot_legal_spend_fm = tot_legal_spend_fm,
-                                      tot_legal_spend_ryo = tot_legal_spend_ryo)
+  illicit <- smkfreediv::IllicitSpend(price_fm = price_fm,
+                                      price_ryo = price_ryo_d,
+                                      illicit_data = illicit_data,
+                                      illicit_data_year = deflate_to[2])
 
   ###############################
   ## sum up RYO and FM figures
@@ -133,6 +158,7 @@ CalcUpshift <- function(data = data,
 
   total_annual_spend_hmrc = tot_spend_fm + tot_spend_ryo
 
+  ## proportion of total expenditure which is on illicit sources
   illicit_prop <- (illicit[["tot_illicit_spend_fm"]] + illicit[["tot_illicit_spend_ryo"]]) / total_annual_spend_hmrc
 
   ## create the amount of illicit spending (Howard Reed calcs)
@@ -166,8 +192,11 @@ return(list(upshift = upshift,
             duty_fm_pp = duty_fm/50,
             avt_rate = avt_fm,
             avt  = avt_fm*price_fm,
+            vat_fm = vat_fm,
             total_excise_per_pack = total_excise_per_pack,
             excise_pct_fm = excise_pct_fm,
+            vat_pct_fm = vat_pct_fm,
+            tax_pct_fm = tax_pct_fm,
             tot_legal_spend_fm = tot_legal_spend_fm,
             tot_illicit_spend_fm = illicit[["tot_illicit_spend_fm"]],
             tot_duty_ryo = tot_duty_ryo,
@@ -176,7 +205,10 @@ return(list(upshift = upshift,
             price_ryo_d = price_ryo_d,
             duty_ryo    = duty_ryo,
             duty_ryo_pp = duty_ryo/10,
+            vat_ryo = vat_ryo,
             excise_pct_ryo = excise_pct_ryo,
+            vat_pct_ryo = vat_pct_ryo,
+            tax_pct_ryo = tax_pct_ryo,
             tot_legal_spend_ryo = tot_legal_spend_ryo,
             tot_illicit_spend_ryo = illicit[["tot_illicit_spend_ryo"]],
             illicit_prop = illicit_prop,

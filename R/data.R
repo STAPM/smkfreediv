@@ -119,7 +119,7 @@
 #'   \item{illicit_share_fm}{share of illicit products in total consumption of factory-made cigarettes.}
 #'   \item{illicit_volume_fm}{volume of illicit cigarettes (billion sticks).}
 #'   \item{illicit_share_ryo}{share of illicit products in total consumption of hand-rolling tobacco.}
-#'   \item{illicit_volume_ryo}{volume of illicit cigarettes (billion sticks).}
+#'   \item{illicit_volume_ryo}{volume of illicit cigarettes (million kg).}
 #' }
 #'
 #' @source

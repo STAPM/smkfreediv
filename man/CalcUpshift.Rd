@@ -7,6 +7,7 @@
 CalcUpshift(
   data = data,
   LCFS = FALSE,
+  vat = 0.2,
   price_fm = 8.83,
   duty_fm = 228.29,
   avt_fm = 0.165,
@@ -17,13 +18,16 @@ CalcUpshift(
   profiles_data = smkfreediv::PHE_tobacco_profiles,
   receipts_data = smkfreediv::tobacco_duty_receipts,
   prices_data = smkfreediv::price_cigs,
+  illicit_data = smkfreediv::tax_gap_data,
   adjust = TRUE
 )
 }
 \arguments{
 \item{data}{Data table. The cleaned toolkit data.}
 
-\item{LCFS}{Logical. If TRUE use the LCFS grossed-up spend estimated by Howard Reed.}
+\item{LCFS}{Logical. If TRUE use the LCFS grossed-up spend for the UK estimated by Howard Reed.}
+
+\item{vat}{Numeric. Rate of value added tax.}
 
 \item{price_fm}{Numeric. Price of factory made cigarettes per pack of 20.}
 
@@ -46,6 +50,8 @@ prices should be deflated.}
 \item{receipts_data}{Data table. Tobacco duty receipts data.}
 
 \item{prices_data}{Data table. Price data for a 20-pack of cigarettes.}
+
+\item{illicit_data}{Data table. Consumption data for illicit sources of tobacco.}
 
 \item{adjust}{Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
 use total UK tobacco duty receipt figure.}

@@ -7,14 +7,14 @@
 #' illicit prices as a fraction of the duty-paid prices (about a half).
 #'
 #' Prices are obtained from \href{https://www.ashscotland.org.uk/media/850413/28-calculating-the-cost-of-smoking-june-2021.pdf}{ASH Scotland},
-#' for. The market share (consumption) figures are taken from the \href{https://www.gov.uk/government/statistics/tobacco-tax-gap-estimates}{tobacco tax gap estimates}.
+#' for. The market share (consumption) figures are taken from the \href{https://www.gov.uk/government/statistics/measuring-tax-gaps-tables}{measuring tax gaps tables 2021}.
 #'
-#' @param price_fm_paid Numeric. The price per cigarette of factory-made cigarettes.
-#' @param price_fm_illicit Numeric. The price per cigarette of illicit factory-made cigarettes.
-#' @param price_ryo_paid Numeric. The price per cigarette of roll-your-own tobacco.
-#' @param price_ryo_illicit Numeric. The price per cigarette of illicit roll-your-own tobacco.
-#' @param tot_legal_spend_fm Numeric. Estimate of total spending on duty-paid factory-made cigarettes.
-#' @param tot_legal_spend_ryo Numeric. Estimate of total spending on duty-paid roll-your-own tobacco.
+#' @param price_fm Numeric. Average price of legally sourced cigarettes.
+#' @param price_ryo Numeric. Average price of legally sourced HRT/RYO tobacco.
+#' @param price_fm_ratio Numeric. The illicit cigarette price as a proportion of legal prices.
+#' @param price_ryo_ratio Numeric. The illicit HRT price as a proportion of legal prices.
+#' @param illicit_data Data table. Consumption data for illicit sources of tobacco.
+#' @param illicit_data_year Numeric. Year of illicit consumption data to use.
 #'
 #' @return
 #' @export
@@ -25,49 +25,42 @@
 #'
 #'
 #' }
-IllicitSpend <- function(price_fm_paid = 56.9,
-                         price_fm_illicit = 28.5,
-                         price_ryo_paid = 26,
-                         price_ryo_illicit = 13,
-                         tot_legal_spend_fm,
-                         tot_legal_spend_ryo,
-                         tax_gap_data = smkfreediv::tax_gap_data) {
+IllicitSpend <- function(price_fm,
+                         price_ryo,
+                         price_fm_ratio = 28.5/56.9,
+                         price_ryo_ratio = 13/26,
+                         illicit_data = smkfreediv::tax_gap_data,
+                         illicit_data_year = 2018) {
 
-  ### illicit price ratios (to adjust total expenditure on illicit by the
-  ### price difference between illicit and duty-paid products)
+  ### obtain the consumption data for FM and RYO from the tax gap tables.
 
-  fm_ratio <- price_fm_illicit/price_fm_paid
-  ryo_ratio <- price_ryo_illicit/price_ryo_paid
+  data <- illicit_data[year == illicit_data_year,]
 
-  ### obtain the consumption market shares for FM and RYO from the tax gap tables.
+  ### calculate expenditure:
 
-  share_illicit_fm = as.numeric(tax_gap_data[Source == "Illicit","share_fm"])
-  share_legal_fm =   as.numeric(tax_gap_data[Source == "Legal","share_fm"])
+  ### FM: price is per 20 cigs, consumption is in billions of cigs
+  ### RYO: price is per 100g of tobacco, consumption is in millions of kg
 
-  share_illicit_ryo = as.numeric(tax_gap_data[Source == "Illicit","share_ryo"])
-  share_legal_ryo =   as.numeric(tax_gap_data[Source == "Legal","share_ryo"])
+  # calculate consumption in packs of 20 sticks / 100g of tobacco
+  # fm multiply by 1bn to get billions of sticks, then divide by 20 to get number of packs of 20
+  # ryo multiply by 1bn (*1mn to get kilograms, *1000 to get in grams, /100 to get number of packs of 100g)
 
-  ### Expenditure market share = consumption market share if the prices are the
-  ### same. Otherwise, reduce the expenditure of illicit by the price ratio.
-  ## calc illicit expenditures if price-ratio = 1 (i.e. expenditure share
-  ## = consumption share)
+  cons_fm  <- as.numeric(data[,"illicit_volume_fm"])  * (1000000000/20)
+  cons_ryo <- as.numeric(data[,"illicit_volume_ryo"]) * (1000000000/100)
 
-  ## illicit spending = legal spending * (prop illegal / prop legal)
+  ### Expenditure = price * price ratio * consumption / 1000000 (to present in £millions)
 
-  temp_illicit_fm =  tot_legal_spend_fm*(share_illicit_fm/share_legal_fm)
-  temp_illicit_ryo = tot_legal_spend_ryo*(share_illicit_ryo/share_legal_ryo)
-
-  ## multiply by the price ratios
-
-  tot_illicit_spend_fm <- temp_illicit_fm * fm_ratio
-  tot_illicit_spend_ryo <- temp_illicit_ryo * ryo_ratio
+  tot_illicit_spend_fm  <- (price_fm * price_fm_ratio * cons_fm)    / 1000000
+  tot_illicit_spend_ryo <- (price_ryo * price_ryo_ratio * cons_ryo) / 1000000
 
   ## return the spending figures
 
   return(list(tot_illicit_spend_fm = tot_illicit_spend_fm,
               tot_illicit_spend_ryo = tot_illicit_spend_ryo,
-              price_ratio_fm = fm_ratio,
-              price_ratio_ryo = ryo_ratio,
-              share_ratio_fm = share_illicit_fm/share_legal_fm,
-              share_ratio_ryo = share_illicit_ryo/share_legal_ryo))
+              price_ratio_fm = price_fm_ratio,
+              price_ratio_ryo = price_ryo_ratio,
+              share_fm = as.numeric(data[,"illicit_volume_fm"]),
+              share_ryo = as.numeric(data[,"illicit_volume_ryo"])
+              ))
+
 }

@@ -5,27 +5,26 @@
 \title{Calculate Illicit Spending}
 \usage{
 IllicitSpend(
-  price_fm_paid = 56.9,
-  price_fm_illicit = 28.5,
-  price_ryo_paid = 26,
-  price_ryo_illicit = 13,
-  tot_legal_spend_fm,
-  tot_legal_spend_ryo,
-  tax_gap_data = smkfreediv::tax_gap_data
+  price_fm,
+  price_ryo,
+  price_fm_ratio = 28.5/56.9,
+  price_ryo_ratio = 13/26,
+  illicit_data = smkfreediv::tax_gap_data,
+  illicit_data_year = 2018
 )
 }
 \arguments{
-\item{price_fm_paid}{Numeric. The price per cigarette of factory-made cigarettes.}
+\item{price_fm}{Numeric. Average price of legally sourced cigarettes.}
 
-\item{price_fm_illicit}{Numeric. The price per cigarette of illicit factory-made cigarettes.}
+\item{price_ryo}{Numeric. Average price of legally sourced HRT/RYO tobacco.}
 
-\item{price_ryo_paid}{Numeric. The price per cigarette of roll-your-own tobacco.}
+\item{price_fm_ratio}{Numeric. The illicit cigarette price as a proportion of legal prices.}
 
-\item{price_ryo_illicit}{Numeric. The price per cigarette of illicit roll-your-own tobacco.}
+\item{price_ryo_ratio}{Numeric. The illicit HRT price as a proportion of legal prices.}
 
-\item{tot_legal_spend_fm}{Numeric. Estimate of total spending on duty-paid factory-made cigarettes.}
+\item{illicit_data}{Data table. Consumption data for illicit sources of tobacco.}
 
-\item{tot_legal_spend_ryo}{Numeric. Estimate of total spending on duty-paid roll-your-own tobacco.}
+\item{illicit_data_year}{Numeric. Year of illicit consumption data to use.}
 }
 \value{
 
@@ -39,7 +38,7 @@ illicit prices as a fraction of the duty-paid prices (about a half).
 }
 \details{
 Prices are obtained from \href{https://www.ashscotland.org.uk/media/850413/28-calculating-the-cost-of-smoking-june-2021.pdf}{ASH Scotland},
-for. The market share (consumption) figures are taken from the \href{https://www.gov.uk/government/statistics/tobacco-tax-gap-estimates}{tobacco tax gap estimates}.
+for. The market share (consumption) figures are taken from the \href{https://www.gov.uk/government/statistics/measuring-tax-gaps-tables}{measuring tax gaps tables 2021}.
 }
 \examples{
 

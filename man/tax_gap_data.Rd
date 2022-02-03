@@ -3,12 +3,15 @@
 \docType{data}
 \name{tax_gap_data}
 \alias{tax_gap_data}
-\title{Tax Gap Market Share Data}
+\title{Measuring Tax Gaps Data}
 \format{
 
 }
 \source{
-\href{https://www.gov.uk/government/statistics/tobacco-tax-gap-estimates}{Tobacco Tax Gap}
+\itemize{
+\item \href{https://www.gov.uk/government/statistics/measuring-tax-gaps/measuring-tax-gaps-2021-edition-tax-gap-estimates-for-2019-to-2020}{Measuring tax gaps 2021 edition - tax gap estimates for 2019 to 2020}
+\item \href{https://www.gov.uk/government/statistics/measuring-tax-gaps-tables}{Measuring tax gaps tables 2021}
+}
 }
 \usage{
 tax_gap_data

@@ -4,56 +4,123 @@ library(data.table)
 ### read in tax gap tables to obtain figures for the share of illicit tobacco
 ### in total consumption, by product
 
-### FM Cigs
 
-data <- readxl::read_excel("data-raw/HMRC-tobacco-tax-gap-tables-2017.xlsx",
-                           sheet = "Table 1.4",
-                           range = "A3:R12")
+#########################
+#### FM Cigarettes ######
+
+### illicit market share
+
+data <- readxl::read_excel("data-raw/Measuring_tax_gaps_tables_2021_edition.xlsx",
+                           sheet = "Table 3.10 - 3.13",
+                           range = "A3:U6")
 setDT(data)
 
-data <- data[c(3,7,9),]
+data <- data[c(2),]
 
-setnames(data,c("...1"),c("Source"))
+setnames(data,c("Illicit market share"),c("variable"))
 
-data[1, Source := "Legal"]
-data[2, Source := "Illicit"]
-data[3, Source := "Cross-Border"]
+data[1, variable := "illicit_share"]
 
 data <- melt(data,
-             id.vars = "Source",
+             id.vars = "variable",
              variable.name = "year",
-             value.name = "share_fm")
+             value.name = "illicit_share_fm")
 
-fm <- copy(data)
 
-### RYO Tob
+### illicit market volume (billion cigarettes)
 
-data <- readxl::read_excel("data-raw/HMRC-tobacco-tax-gap-tables-2017.xlsx",
-                           sheet = "Table 1.6",
-                           range = "A3:R15")
+data_vol <- readxl::read_excel("data-raw/Measuring_tax_gaps_tables_2021_edition.xlsx",
+                           sheet = "Table 3.10 - 3.13",
+                           range = "A32:U35")
+setDT(data_vol)
+
+data_vol <- data_vol[c(2),]
+
+setnames(data_vol,c("Illicit market"),c("variable"))
+
+data_vol[1, variable := "illicit_vol"]
+
+data_vol <- melt(data_vol,
+             id.vars = "variable",
+             variable.name = "year",
+             value.name = "illicit_volume_fm")
+
+#### combine data tables
+
+fm_data <- merge(data[,c("year","illicit_share_fm")],
+                 data_vol[,c("year","illicit_volume_fm")],
+                 by = "year", sort = F)
+
+yr <- seq(2000:2019)
+
+fm_data[, tax_year := year ]
+fm_data[, year := yr + 2000 - 1]
+
+#######################
+#### RYO Tobacco ######
+
+### illicit market share
+
+data <- readxl::read_excel("data-raw/Measuring_tax_gaps_tables_2021_edition.xlsx",
+                           sheet = "Table 3.14 - 3.17",
+                           range = "A3:U6")
 setDT(data)
 
-data <- data[c(3,7,11),]
+data <- data[c(2),]
 
-setnames(data,c("...1"),c("Source"))
+setnames(data,c("Illicit market share"),c("variable"))
 
-data[1, Source := "Legal"]
-data[2, Source := "Illicit"]
-data[3, Source := "Cross-Border"]
+data[1, variable := "illicit_share"]
 
 data <- melt(data,
-             id.vars = "Source",
+             id.vars = "variable",
              variable.name = "year",
-             value.name = "share_ryo")
+             value.name = "illicit_share_ryo")
 
-ryo <- copy(data)
 
-##### Merge and retain most recent year (2016-17 tax year)
+### illicit market volume (billion cigarettes)
 
-data <- merge(fm, ryo, by = c("Source","year"), sort = F)
+data_vol <- readxl::read_excel("data-raw/Measuring_tax_gaps_tables_2021_edition.xlsx",
+                               sheet = "Table 3.14 - 3.17",
+                               range = "A32:U35")
+setDT(data_vol)
 
-data <- data[year == "2016-17", ]
-data[, year := NULL ]
+data_vol <- data_vol[c(2),]
 
-tax_gap_data <- copy(data)
+setnames(data_vol,c("Illicit market"),c("variable"))
+
+data_vol[1, variable := "illicit_vol"]
+
+data_vol <- melt(data_vol,
+                 id.vars = "variable",
+                 variable.name = "year",
+                 value.name = "illicit_volume_ryo")
+
+#### combine data tables
+
+ryo_data <- merge(data[,c("year","illicit_share_ryo")],
+                 data_vol[,c("year","illicit_volume_ryo")],
+                 by = "year", sort = F)
+
+yr <- seq(2000:2019)
+
+ryo_data[, tax_year := year ]
+ryo_data[, year := yr + 2000 - 1]
+
+
+#########################################
+### Merge RYO to FM data and save out ###
+
+tax_gap_data <- merge(fm_data, ryo_data, by = c("year","tax_year"))
+
+
 usethis::use_data(tax_gap_data, overwrite = TRUE)
+
+
+
+
+
+
+
+
+

@@ -104,13 +104,29 @@
 #' @format
 "prop_smokers_ENG"
 
-#' Tax Gap Market Share Data
+#' Measuring Tax Gaps Data
 #'
-#' Based on the most recently available data (2016/2017), the breakdown of UK tobacco
-#' consumption by product into duty-paid, illicit, and cross-border consumption.
+#' Data extract from the 2021 measuring tax gaps tables produced by HMRC. Contains estimates of the volume of illicit consumption of
+#' cigarettes and hand-rolling tobacco from 2000-01 to 2019-20.
+#'
+#' @docType data
 #'
 #' @format
-#' @source \href{https://www.gov.uk/government/statistics/tobacco-tax-gap-estimates}{Tobacco Tax Gap}
+#'
+#' \describe{
+#'   \item{year}{year (calendar)}
+#'   \item{tax_year}{year (tax)}
+#'   \item{illicit_share_fm}{share of illicit products in total consumption of factory-made cigarettes.}
+#'   \item{illicit_volume_fm}{volume of illicit cigarettes (billion sticks).}
+#'   \item{illicit_share_ryo}{share of illicit products in total consumption of hand-rolling tobacco.}
+#'   \item{illicit_volume_ryo}{volume of illicit cigarettes (billion sticks).}
+#' }
+#'
+#' @source
+#' \itemize{
+#' \item \href{https://www.gov.uk/government/statistics/measuring-tax-gaps/measuring-tax-gaps-2021-edition-tax-gap-estimates-for-2019-to-2020}{Measuring tax gaps 2021 edition - tax gap estimates for 2019 to 2020}
+#' \item \href{https://www.gov.uk/government/statistics/measuring-tax-gaps-tables}{Measuring tax gaps tables 2021}
+#' }
 "tax_gap_data"
 
 #' Tobacco Duty Receipts

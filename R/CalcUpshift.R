@@ -91,8 +91,8 @@ CalcUpshift <- function(data = data,
   tot_duty_ryo <- as.numeric(receipts_data[year == deflate_to[2],"RYO_tob"])
 
   if (adjust == TRUE) {
-    tot_duty_fm  <- tot_duty_fm*smkfreediv::prop_duty_ENG
-    tot_duty_ryo <- tot_duty_ryo*smkfreediv::prop_duty_ENG
+    tot_duty_fm  <- tot_duty_fm*prop_duty_ENG
+    tot_duty_ryo <- tot_duty_ryo*prop_duty_ENG
   }
 
   ########################

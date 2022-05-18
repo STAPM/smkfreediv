@@ -19,7 +19,8 @@ CalcUpshift(
   receipts_data = smkfreediv::tobacco_duty_receipts,
   prices_data = smkfreediv::price_cigs,
   illicit_data = smkfreediv::tax_gap_data,
-  adjust = TRUE
+  adjust = TRUE,
+  prop_duty_ENG = 0.766
 )
 }
 \arguments{
@@ -55,6 +56,8 @@ prices should be deflated.}
 
 \item{adjust}{Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
 use total UK tobacco duty receipt figure.}
+
+\item{prop_duty_ENG}{Numeric. Proportion of total tobacco duty which is paid from England.}
 }
 \value{
 

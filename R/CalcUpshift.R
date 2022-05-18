@@ -30,6 +30,7 @@
 #' @param illicit_data Data table. Consumption data for illicit sources of tobacco.
 #' @param adjust Logical. If TRUE (default) adjust total receipts by the proportion of smokers who are English. If FALSE
 #' use total UK tobacco duty receipt figure.
+#' @param prop_duty_ENG Numeric. Proportion of total tobacco duty which is paid from England.
 #'
 #' @return
 #' @export
@@ -63,7 +64,8 @@ CalcUpshift <- function(data = data,
                         receipts_data = smkfreediv::tobacco_duty_receipts,
                         prices_data = smkfreediv::price_cigs,
                         illicit_data = smkfreediv::tax_gap_data,
-                        adjust = TRUE) {
+                        adjust = TRUE,
+                        prop_duty_ENG = 0.766) {
 
   #################################
   # Total Spending Calc - Toolkit #
@@ -89,8 +91,8 @@ CalcUpshift <- function(data = data,
   tot_duty_ryo <- as.numeric(receipts_data[year == deflate_to[2],"RYO_tob"])
 
   if (adjust == TRUE) {
-    tot_duty_fm  <- tot_duty_fm*smkfreediv::prop_smokers_ENG
-    tot_duty_ryo <- tot_duty_ryo*smkfreediv::prop_smokers_ENG
+    tot_duty_fm  <- tot_duty_fm*smkfreediv::prop_duty_ENG
+    tot_duty_ryo <- tot_duty_ryo*smkfreediv::prop_duty_ENG
   }
 
   ########################

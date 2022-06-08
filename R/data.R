@@ -90,6 +90,21 @@
 #' }
 "price_cigs_oecd"
 
+#' Price of Hand-rolled tobacco
+#'
+#' Scalar average price of a 100g pack of handrolled / roll-your own (RYO) tobacco, obtained from
+#' price quotes collected by the ONS, underlying the CPI and RPI price indices.
+#' Price calculated for December 2018. Unweighted mean price of N = 144 valid observations for price
+#' yields a price for RYO estimated at £45.52 per 100g.
+#'
+#' @docType data
+#'
+#' @source
+#' \itemize{
+#' \item \href{https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/consumerpriceindicescpiandretailpricesindexrpiitemindicesandpricequotes}{Consumer price inflation item indices and price quotes - Price quotes: December 2018 edition}
+#' }
+"price_ryo_ons"
+
 #' Proportion of English Smokers
 #'
 #' A scalar proportion of total UK smokers that are English. This is used to adjust UK total duty receipts from tobacco

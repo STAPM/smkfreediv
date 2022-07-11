@@ -3,19 +3,19 @@ library(data.table)
 
 
 
-Year <- rep(1988:2021, each = 12)
-month <- rep(1:12, times = 2021 - 1988 + 1)
+Year <- c(rep(1988:2021, each = 12) , rep(2022,5))
+month <- c(rep(1:12, times = 2021 - 1988 + 1), 1:5)
 
 data <- data.table(Year,month)
 
-data <- data[-c(403:408),]
+#data <- data[-c(403:408),]
 
 
 
 
-cpi <- readxl::read_excel("data-raw/series-230721.xls",
+cpi <- readxl::read_excel("data-raw/series-110722-tobacco-cpi.xls",
                            sheet = "data",
-                           range = "A176:B577",
+                           range = "A180:B592",
                            col_names = FALSE)
 
 setDT(cpi)

@@ -80,18 +80,5 @@ GetIncome <- function(income_data = smkfreediv::income,
 
   data_out <- data_out[order(UTLAname)]
 
-  ############################################
-  #### INFLATION ADJUSTMENT TO JANUARY 2022 ##
-
-  ###### Adjust from 2019 to January 2022 based on the CPIH:
-  ### https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/l522/mm23
-
-  ## Base July 2015 = 100, July 2019 = 108, January 2022 = 114.6
-  ##
-  ## Scale up by 114.6/108 = 1.061111
-
-  data_out[, income     := income * 1.061111]
-  data_out[, income_sim := income_sim * 1.061111]
-
   return(data_out)
 }

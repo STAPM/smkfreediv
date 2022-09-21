@@ -155,15 +155,3 @@
 #' @source \href{https://www.gov.uk/government/statistics/tobacco-bulletin}{ONS Tobacco Bulletin}
 "tobacco_duty_receipts"
 
-#' Processed Toolkit Data
-#'
-#' Toolkit data taken from the April 2014 - February 2020 waves to be used in calculating the
-#' tobacco expenditure by local authority. Expenditures are deflated to December 2018 prices.
-#'
-#' Data includes variables on consumption and expenditure of tobacco products, upper tier local authority
-#' and region indicators, and socioeconomic variables including age, sex, social grade, education,
-#' and labour market status.
-#'
-#' @format
-"TOOLKIT"
-

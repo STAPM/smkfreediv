@@ -6,7 +6,7 @@
 #'
 #' @param path path to the directory where the raw SPSS data is saved
 #' @param data name of the data file (defaults to the April 2021 version)
-#' @param save Logical. If TRUE, saves out a copy of the data in RDS format
+#' @param save Logical. If TRUE, saves out a copy of the data in RDS format to the same directory as the raw data.
 #' @param name Character. Name of the file to export
 #'
 #' @importFrom data.table := copy rbindlist setDT

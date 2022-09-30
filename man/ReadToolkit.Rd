@@ -11,7 +11,7 @@ ReadToolkit(path, data, save = TRUE, name)
 
 \item{data}{name of the data file (defaults to the April 2021 version)}
 
-\item{save}{Logical. If TRUE, saves out a copy of the data in RDS format}
+\item{save}{Logical. If TRUE, saves out a copy of the data in RDS format to the same directory as the raw data.}
 
 \item{name}{Character. Name of the file to export}
 }

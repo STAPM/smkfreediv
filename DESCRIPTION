@@ -1,7 +1,7 @@
 Package: smkfreediv
 Type: Package
 Title: Smoke Free Dividend Calculations
-Version: 1.5.2
+Version: 1.6.0
 Authors@R: person(given = "Damon",
            family = "Morris",
            role = c("aut","cre"),

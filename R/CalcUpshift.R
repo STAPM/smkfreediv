@@ -71,10 +71,10 @@ CalcUpshift <- function(data = data,
   # Total Spending Calc - Toolkit #
 
   # calculate mean weekly expenditure per smoker
-  tot_mean_spend <- round( as.numeric( smkfreediv::CalcWeekSpend(data, strat_vars = NULL, upshift = 1)[,"mean_week_spend"] ), 2)
+  tot_mean_spend <- as.numeric( smkfreediv::CalcWeekSpend(data, strat_vars = NULL, upshift = 1)[,"mean_week_spend"] )
 
   # calculate total number of smokers from the tobacco profiles
-  tot_smokers    <- round( sum(profiles_data[, "n_smokers"], na.rm = T) )
+  tot_smokers    <- sum(profiles_data[, "n_smokers"], na.rm = T)
 
   # calculate total weekly expenditure and total annual expenditure (millions)
   total_weekly_spend <- (tot_mean_spend * tot_smokers )/1000000

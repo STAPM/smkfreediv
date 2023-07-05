@@ -42,8 +42,8 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
 
   det <- copy(merged_all)
 
-  det[, total_wk_exp := round((n_smokers * mean_week_spend)/1000)]
-  det[, total_annual_exp := round((n_smokers * mean_week_spend * 52)/1000000, 3)]
+  det[, total_wk_exp := (n_smokers * mean_week_spend)/1000]
+  det[, total_annual_exp := (n_smokers * mean_week_spend * 52)/1000000]
 
   det[, spend_prop := (mean_week_spend * 52)/income]
 
@@ -86,8 +86,8 @@ CalcDividend_la <- function(profiles = smkfreediv::PHE_tobacco_profiles,
   ### repeat upshifting/dividend calculations with the
   ### probabilistically drawn values
 
-  prob[, prob_total_wk_exp := round((prob_n_smokers * prob_mean_week_spend)/1000)]
-  prob[, prob_total_annual_exp := round((prob_n_smokers * prob_mean_week_spend * 52)/1000000, 3)]
+  prob[, prob_total_wk_exp := (prob_n_smokers * prob_mean_week_spend)/1000]
+  prob[, prob_total_annual_exp := (prob_n_smokers * prob_mean_week_spend * 52)/1000000]
 
   prob[, prob_spend_prop := (prob_mean_week_spend * 52)/prob_income]
 

@@ -28,6 +28,8 @@ DeflateToolkit <- function(data = data,
   cpi_base <- as.numeric(smkfreediv::cpi_tobacco[Year == base_year & month == base_month, "cpi"])
   index[, cpi := 100*cpi/cpi_base]
 
+  index[, month := NULL]
+
   ## merge to the toolkit data
 
   data <- merge(data, index, by = c("Year","Month"), all.x = TRUE, sort = FALSE)

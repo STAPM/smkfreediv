@@ -26,9 +26,6 @@ CalcDividend_gor(
 
 \item{illicit_prop}{Numeric. The proportion of total tobacco expenditure which is illicit.}
 }
-\value{
-
-}
 \description{
 Calculate the smoke-free dividend for each local authority.
 }

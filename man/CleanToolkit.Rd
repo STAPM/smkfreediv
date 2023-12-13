@@ -13,9 +13,6 @@ CleanToolkit(data = data, start_month, end_month)
 
 \item{end_month}{Numeric. Toolkit end month for the analysis period.}
 }
-\value{
-
-}
 \description{
 Clean the raw toolkit data to produce a dataset that can be used for the
 smoke free dividend calculations

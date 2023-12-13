@@ -30,9 +30,6 @@ CalcDividend_gor_sim(
 \item{income_var}{Integer. Option governing which income variable is used. 1 for net household income,
 2 for net household income equivalised, and 3 for net household income equivalised after housing costs.}
 }
-\value{
-
-}
 \description{
 Calculate the smoke-free dividend for each local authority, using simulation
 methods to incorporate parameter uncertainty in weekly expenditure, local smoking

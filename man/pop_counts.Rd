@@ -5,7 +5,7 @@
 \alias{pop_counts}
 \title{Population.}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 151 rows and 3 columns.
 }
 \source{
 \href{https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates/datasets/populationestimatesforukenglandandwalesscotlandandnorthernireland}{ONS Population Data}

@@ -5,7 +5,7 @@
 \alias{localauthorities}
 \title{Local Authority Names and Codes.}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 348 rows and 4 columns.
 }
 \source{
 \href{https://data.gov.uk/dataset/6ee49b1e-0f4d-4079-90f4-b626e36d2035/lower-tier-local-authority-to-upper-tier-local-authority-april-2019-lookup-in-england-and-wales}{Local Authority lookup}

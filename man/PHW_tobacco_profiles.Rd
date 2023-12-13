@@ -5,7 +5,7 @@
 \alias{PHW_tobacco_profiles}
 \title{PHW Tobacco Profiles.}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 22 rows and 7 columns.
 }
 \source{
 \href{https://publichealthwales.shinyapps.io/smokinginwales/}{PHW local tobacco profiles}

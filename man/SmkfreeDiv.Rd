@@ -29,9 +29,6 @@ SmkfreeDiv(
 
 \item{seed}{Numeric. Random number seed for the simulation}
 }
-\value{
-
-}
 \description{
 Calculate the smoke-free dividend at upper tier local authority (UTLA) level based on input. Requires
 a data table of UTLA tobacco profiles and a data table of UTLA mean weekly tobacco expenditure calculated

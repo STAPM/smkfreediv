@@ -15,9 +15,6 @@ ReadToolkit(path, data, save = TRUE, name)
 
 \item{name}{Character. Name of the file to export}
 }
-\value{
-
-}
 \description{
 Reads in the raw Smoking Toolkit Study (STS) data in SPSS format
 and saves to a chosen directory in RDS format as well as returning it as

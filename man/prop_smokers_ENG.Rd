@@ -5,7 +5,7 @@
 \alias{prop_smokers_ENG}
 \title{Proportion of English Smokers}
 \format{
-
+An object of class \code{numeric} of length 1.
 }
 \usage{
 prop_smokers_ENG

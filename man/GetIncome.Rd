@@ -12,9 +12,6 @@ GetIncome(income_data = smkfreediv::income, income_var = 3)
 \item{income_var}{Integer. Option governing which income variable is used. 1 for net household income,
 2 for net household income equivalised, and 3 for net household income equivalised after housing costs.}
 }
-\value{
-
-}
 \description{
 Select one of the stored income variables to construct at upper-tier local authority level from the
 variables stored in the package data \code{la_inc_pop} at lower-tier local authority level.

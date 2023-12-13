@@ -5,7 +5,7 @@
 \alias{tobacco_duty_receipts}
 \title{Tobacco Duty Receipts}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 30 rows and 6 columns.
 }
 \source{
 \href{https://www.gov.uk/government/statistics/tobacco-bulletin}{ONS Tobacco Bulletin}

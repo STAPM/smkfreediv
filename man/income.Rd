@@ -5,7 +5,7 @@
 \alias{income}
 \title{Local Authority Income Data.}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 326 rows and 14 columns.
 }
 \source{
 \href{https://www.ons.gov.uk/employmentandlabourmarket/peopleinwork/earningsandworkinghours/datasets/smallareaincomeestimatesformiddlelayersuperoutputareasenglandandwales}{Income Data}

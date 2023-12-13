@@ -5,7 +5,7 @@
 \alias{cpi_tobacco}
 \title{CPI Index for Tobacco}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 413 rows and 4 columns.
 }
 \source{
 \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/d7cb/mm23}{Tobacco CPI time series}

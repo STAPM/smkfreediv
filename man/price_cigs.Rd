@@ -5,7 +5,7 @@
 \alias{price_cigs}
 \title{Price of Cigarettes}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 412 rows and 3 columns.
 }
 \source{
 \href{https://www.ons.gov.uk/economy/inflationandpriceindices/timeseries/czmp}{ONS Cigarette prices}

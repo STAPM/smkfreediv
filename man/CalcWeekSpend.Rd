@@ -13,9 +13,6 @@ CalcWeekSpend(data, strat_vars, upshift = 1)
 
 \item{upshift}{Numeric. Parameter to upshift expenditures calculated from the toolkit data.}
 }
-\value{
-
-}
 \description{
 Generates weekly spending on tobacco as a weighted mean across individuals in the sample.
 }

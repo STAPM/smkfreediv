@@ -26,9 +26,6 @@ IllicitSpend(
 
 \item{illicit_data_year}{Numeric. Year of illicit consumption data to use.}
 }
-\value{
-
-}
 \description{
 Calculates the spending on illicit tobacco sources. First obtain the market share of
 illicit tobacco consumption from HMRC tax gap tables for both factory-made and roll-your-own and obtain an

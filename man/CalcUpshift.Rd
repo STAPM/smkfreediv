@@ -59,9 +59,6 @@ use total UK tobacco duty receipt figure.}
 
 \item{prop_duty_ENG}{Numeric. Proportion of total tobacco duty which is paid from England.}
 }
-\value{
-
-}
 \description{
 As survey data tends to underestimate expenditure on tobacco products, this function
 combines estimated total expenditure in the Smoking Toolkit Study data with estimates

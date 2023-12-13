@@ -5,7 +5,7 @@
 \alias{PHE_tobacco_profiles}
 \title{PHE Tobacco Profiles.}
 \format{
-
+An object of class \code{data.table} (inherits from \code{data.frame}) with 151 rows and 8 columns.
 }
 \source{
 \href{https://fingertips.phe.org.uk/profile/tobacco-control/data#page/0}{PHE local tobacco profiles}

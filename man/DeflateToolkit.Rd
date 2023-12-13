@@ -20,9 +20,6 @@ DeflateToolkit(
 
 \item{base_year}{End month for the analysis period}
 }
-\value{
-
-}
 \description{
 Use the ONS time series on cigarette prices to deflate tobacco expenditures
 in the toolkit data to a base month and year
